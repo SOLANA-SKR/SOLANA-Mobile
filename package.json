@@ -1,0 +1,16 @@
+{
+  "name": "skr-airdrop",
+  "version": "1.0.0",
+  "description": "SKR Airdrop site",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@solana/spl-token": "^0.4.8",
+    "@solana/web3.js": "^1.95.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "express": "^4.19.0"
+  }
+}
