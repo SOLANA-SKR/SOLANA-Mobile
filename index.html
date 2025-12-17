@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -111,6 +111,20 @@
       justify-content:flex-end;
       max-width:60%;
     }
+
+    .lang-select{
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(0,0,0,.6);
+      color:var(--text);
+      padding:6px 10px;
+      font-size:.8rem;
+      outline:none;
+    }
+    .lang-select option{
+      color:#000;
+    }
+
     .addr{
       font-size:13px;
       color:rgba(232,238,246,.65);
@@ -277,6 +291,14 @@
     }
     .hero-badge b{
       color:var(--sol-a);
+    }
+
+    .hero-note{
+      position:relative;
+      z-index:1;
+      margin-top:4px;
+      font-size:.86rem;
+      color:var(--muted);
     }
 
     .hero-status{
@@ -505,23 +527,33 @@
     </div>
 
     <nav class="navlinks">
-      <a href="#mission">Миссия</a>
-      <a href="#inflation">Инфляция</a>
-      <a href="#tokenomics">Токеномика</a>
+      <a href="#mission" data-i18n="nav_mission">Миссия</a>
+      <a href="#inflation" data-i18n="nav_inflation">Инфляция</a>
+      <a href="#tokenomics" data-i18n="nav_tokenomics">Токеномика</a>
     </nav>
 
     <div class="actions">
-      <span class="addr" id="wallet-address">Кошелёк: не подключён</span>
-      <button class="btn" id="connect-btn">Подключить кошелёк</button>
-      <button class="btn btn-primary" id="claim-btn" disabled>Забрать монеты</button>
-      <button class="btn" id="raffle-btn" disabled>Участвовать в розыгрыше 3&nbsp;SOL</button>
+      <select id="lang-select" class="lang-select">
+        <option value="ru">RU</option>
+        <option value="en">EN</option>
+        <option value="de">DE</option>
+        <option value="zh">中文</option>
+        <option value="ja">日本語</option>
+        <option value="uk">UA</option>
+        <option value="pl">PL</option>
+        <option value="ar">العربية</option>
+      </select>
+
+      <span class="addr" id="wallet-address"></span>
+      <button class="btn" id="connect-btn"></button>
+      <button class="btn btn-primary" id="claim-btn" disabled></button>
+      <button class="btn" id="raffle-btn" disabled></button>
     </div>
   </header>
 
   <main class="wrap">
-    <!-- HERO (S + логотип) -->
+    <!-- HERO -->
     <section class="hero">
-      <!-- можешь заменить src на свой логотип -->
       <img
         src="https://purple-accused-scorpion-11.mypinata.cloud/ipfs/bafybeifvwriqjehl62zeceva2yp7653jxy7sghyehrqh263aeuqbecsy7i"
         alt="Mobile SKR Logo"
@@ -531,39 +563,25 @@
       <div class="hero-s" aria-hidden="true">S</div>
 
       <div class="hero-sub">
-        <span><b>Mobile SKR</b> · собственный актив экосистемы</span>
+        <span data-i18n="hero_sub_1"></span>
         <span>·</span>
-        <span>открытая мобильная платформа</span>
+        <span data-i18n="hero_sub_2"></span>
       </div>
 
-      <div class="hero-badge">
-        🎁 Аирдроп перед пулом · <b>500&nbsp;SKR</b> за кошелёк
-      </div>
+      <div class="hero-badge" data-i18n="hero_badge"></div>
 
-      <div class="hero-status" id="status">
-        Подключи кошелёк, чтобы забрать монеты и участвовать в розыгрыше.
-      </div>
+      <div class="hero-note" data-i18n="airdrop_desc"></div>
+
+      <div class="hero-status" id="status"></div>
     </section>
 
     <!-- МИССИЯ -->
     <section class="grid2" id="mission">
       <div class="panel">
-        <h2>Наша миссия</h2>
-        <p>
-          Сегодня мобильная дуополия решает, какие приложения будут доступны,
-          кто получит выплаты и какие правила действуют. Mobile SKR строит
-          открытую мобильную платформу, где управление и ценность делятся
-          между сообществом.
-        </p>
-        <p>
-          SKR — собственный актив экосистемы. Он распределяет контроль,
-          поддерживает модерацию и выравнивает стимулы между разработчиками,
-          пользователями и партнёрами по оборудованию.
-        </p>
-        <p>
-          С токеном SKR сообщество управляет развитием, а пользователи и
-          разработчики получают долю создаваемой ими стоимости.
-        </p>
+        <h2 data-i18n="mission_title"></h2>
+        <p data-i18n="mission_p1"></p>
+        <p data-i18n="mission_p2"></p>
+        <p data-i18n="mission_p3"></p>
       </div>
 
       <div class="panel">
@@ -571,22 +589,22 @@
           <article class="card">
             <div class="card-icon">✳</div>
             <div>
-              <h4>Децентрализованное управление</h4>
-              <p>Стейк для стражей, которые проверяют устройства и курируют магазин приложений.</p>
+              <h4 data-i18n="card1_title"></h4>
+              <p data-i18n="card1_body"></p>
             </div>
           </article>
           <article class="card">
             <div class="card-icon">☘</div>
             <div>
-              <h4>Ответственность за экосистему</h4>
-              <p>Казна сообщества, гранты и инициативы по развитию протокола и мобильного стека.</p>
+              <h4 data-i18n="card2_title"></h4>
+              <p data-i18n="card2_body"></p>
             </div>
           </article>
           <article class="card">
             <div class="card-icon">▦</div>
             <div>
-              <h4>Согласованные стимулы</h4>
-              <p>Разработчики, пользователи и партнёры по железу делят upside от продукта.</p>
+              <h4 data-i18n="card3_title"></h4>
+              <p data-i18n="card3_body"></p>
             </div>
           </article>
         </div>
@@ -596,40 +614,40 @@
     <!-- ИНФЛЯЦИЯ -->
     <section class="inflation" id="inflation">
       <div class="panel">
-        <h2>Линейная инфляция</h2>
-        <p>Модель эмиссии SKR поощряет ранних участников и выходит к устойчивой ставке.</p>
+        <h2 data-i18n="inflation_title"></h2>
+        <p data-i18n="inflation_p"></p>
 
         <div class="metric">
           <div class="card-icon">1</div>
           <div>
-            <span class="metric-title">Год 1</span>
-            <small>Инфляция 10% от общего объёма (пример).</small>
+            <span class="metric-title" data-i18n="metric1_title"></span>
+            <small data-i18n="metric1_desc"></small>
           </div>
         </div>
 
         <div class="metric">
           <div class="card-icon">↘</div>
           <div>
-            <span class="metric-title">Ежегодный распад</span>
-            <small>Снижение инфляции на 25% в год до целевой ставки.</small>
+            <span class="metric-title" data-i18n="metric2_title"></span>
+            <small data-i18n="metric2_desc"></small>
           </div>
         </div>
 
         <div class="metric">
           <div class="card-icon">✓</div>
           <div>
-            <span class="metric-title">Конечная ставка</span>
-            <small>Долгосрочная инфляция 2% — поддерживает безопасность и развитие.</small>
+            <span class="metric-title" data-i18n="metric3_title"></span>
+            <small data-i18n="metric3_desc"></small>
           </div>
         </div>
       </div>
 
       <div class="chart-box">
-        <div class="chart-label">Seeker · SKR Inflation Rate</div>
+        <div class="chart-label" data-i18n="inflation_chart_label"></div>
         <div class="chart">
           <svg viewBox="0 0 640 480" preserveAspectRatio="none">
             <g class="grid">
-              <!-- вертикальные -->
+              <!-- vertical -->
               <line x1="80" y1="40" x2="80" y2="420"></line>
               <line x1="152" y1="40" x2="152" y2="420"></line>
               <line x1="224" y1="40" x2="224" y2="420"></line>
@@ -638,7 +656,7 @@
               <line x1="440" y1="40" x2="440" y2="420"></line>
               <line x1="512" y1="40" x2="512" y2="420"></line>
               <line x1="584" y1="40" x2="584" y2="420"></line>
-              <!-- горизонтальные -->
+              <!-- horizontal -->
               <line x1="80" y1="420" x2="600" y2="420"></line>
               <line x1="80" y1="356" x2="600" y2="356"></line>
               <line x1="80" y1="292" x2="600" y2="292"></line>
@@ -651,7 +669,7 @@
             <line class="axis" x1="80" y1="40" x2="80" y2="420"></line>
             <line class="axis" x1="80" y1="420" x2="600" y2="420"></line>
 
-            <!-- кривая (10% -> 2%) -->
+            <!-- curve -->
             <path class="curve"
               d="M 80 120
                  C 160 190, 220 250, 296 285
@@ -665,7 +683,7 @@
     <!-- ТОКЕНОМИКА -->
     <section class="tokenomics" id="tokenomics">
       <div class="pie-box">
-        <div class="chart-label">Seeker · SKR Distribution</div>
+        <div class="chart-label" data-i18n="dist_chart_label"></div>
         <div class="pie">
           <svg viewBox="0 0 520 360">
             <defs>
@@ -683,7 +701,6 @@
               </linearGradient>
             </defs>
 
-            <!-- простая "3D" диаграмма -->
             <ellipse cx="260" cy="230" rx="150" ry="46" fill="rgba(0,0,0,.32)" />
             <path d="M260,190 L260,90 A120,120 0 0,1 370,130 Z" fill="url(#g1)" />
             <path d="M260,190 L370,130 A120,120 0 0,1 332,290 Z" fill="url(#g2)" />
@@ -691,62 +708,56 @@
             <path d="M260,190 L180,300 A120,120 0 0,1 260,90 Z" fill="url(#g3)" />
           </svg>
         </div>
-        <div class="note">
-          Диаграмма иллюстрирует доли: airdrop, рост и партнёрства, команда,
-          ликвидность, казначейство. Проценты смотри в таблице справа.
-        </div>
+        <div class="note" data-i18n="dist_note"></div>
       </div>
 
       <div class="panel">
-        <h2>Токеномика</h2>
+        <h2 data-i18n="tokenomics_title"></h2>
         <table>
           <tr>
-            <th>Категория</th>
-            <th>Распределение</th>
-            <th>Разблокировка</th>
+            <th data-i18n="table_head_cat"></th>
+            <th data-i18n="table_head_alloc"></th>
+            <th data-i18n="table_head_unlock"></th>
           </tr>
           <tr>
-            <td>Аирдропы</td>
-            <td>30%</td>
-            <td>Разблокировано при запуске</td>
+            <td data-i18n="row1_cat"></td>
+            <td data-i18n="row1_alloc"></td>
+            <td data-i18n="row1_unlock"></td>
           </tr>
           <tr>
-            <td>Рост и партнёрства</td>
-            <td>25%</td>
-            <td>28% при запуске, далее линейно 18&nbsp;мес.</td>
+            <td data-i18n="row2_cat"></td>
+            <td data-i18n="row2_alloc"></td>
+            <td data-i18n="row2_unlock"></td>
           </tr>
           <tr>
-            <td>Команда Mobile SKR</td>
-            <td>15%</td>
-            <td>12-месячный cliff, 36-месячный vest</td>
+            <td data-i18n="row3_cat"></td>
+            <td data-i18n="row3_alloc"></td>
+            <td data-i18n="row3_unlock"></td>
           </tr>
           <tr>
-            <td>Ликвидность и запуск</td>
-            <td>10%</td>
-            <td>Разблокировано при запуске</td>
+            <td data-i18n="row4_cat"></td>
+            <td data-i18n="row4_alloc"></td>
+            <td data-i18n="row4_unlock"></td>
           </tr>
           <tr>
-            <td>Solana Labs / партнёры</td>
-            <td>10%</td>
-            <td>Cliff + линейный vest</td>
+            <td data-i18n="row5_cat"></td>
+            <td data-i18n="row5_alloc"></td>
+            <td data-i18n="row5_unlock"></td>
           </tr>
           <tr>
-            <td>Казначейство сообщества</td>
-            <td>10%</td>
-            <td>Управляется через голосование</td>
+            <td data-i18n="row6_cat"></td>
+            <td data-i18n="row6_alloc"></td>
+            <td data-i18n="row6_unlock"></td>
           </tr>
         </table>
 
-        <div class="supply">
-          Общий объём: <b>10&nbsp;000&nbsp;000&nbsp;000 SKR</b><br />
-          Токен: <b>Mobile SKR</b> · Mint: <code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>
-        </div>
+        <div class="supply" data-i18n="supply_html" data-i18n-html="1"></div>
       </div>
     </section>
   </main>
 
   <script>
-    // ===== ПАРТИКЛЫ НА ФОНЕ (как "снег"/пыль) =====
+    // ===== ПАРТИКЛЫ НА ФОНЕ =====
     (function () {
       const canvas = document.getElementById("dust");
       const ctx = canvas.getContext("2d");
@@ -795,81 +806,723 @@
       tick();
     })();
 
-    // ===== КОШЕЛЁКИ + КНОПКИ =====
+    // ===== I18N & UI =====
     const connectBtn = document.getElementById("connect-btn");
     const claimBtn = document.getElementById("claim-btn");
     const raffleBtn = document.getElementById("raffle-btn");
     const statusEl = document.getElementById("status");
     const addrEl = document.getElementById("wallet-address");
+    const langSelect = document.getElementById("lang-select");
 
     let walletProvider = null;
     let walletAddress = null;
+
+    const translations = {
+      ru: {
+        wallet_label_disconnected: "Кошелёк: не подключён",
+        wallet_label_connected: "Кошелёк: {addr}",
+        btn_connect: "Подключить кошелёк",
+        btn_connected: "Подключён",
+        btn_claim: "Забрать монеты",
+        btn_raffle: "Участвовать в розыгрыше 3 SOL",
+        status_initial: "Подключи кошелёк, чтобы забрать монеты и участвовать в розыгрыше.",
+        status_connected: "Кошелёк подключён. Можно забирать монеты и участвовать в розыгрыше.",
+        status_connect_error: "Ошибка подключения кошелька.",
+        status_claim_sending: "Отправляю заявку на airdrop...",
+        status_claim_error_generic: "Ошибка: не удалось получить airdrop.",
+        status_claim_network: "Сетевая ошибка. Попробуй ещё раз.",
+        status_raffle_sending: "Регистрирую участие в розыгрыше 3 SOL...",
+        status_raffle_error_generic: "Ошибка регистрации в розыгрыше.",
+        status_raffle_network: "Сетевая ошибка при регистрации в розыгрыше.",
+        claim_success_plain: "Успех! 500 SKR отправлены на твой кошелёк.",
+        view_tx: "смотреть в Solscan",
+        raffle_success: "Ты участвуешь в розыгрыше 3 SOL. Всего победителей: 10.",
+        alert_no_wallet: "Не найден ни один Solana-кошелёк. Установи Phantom, Solflare, Backpack и т.п.",
+        nav_mission: "Миссия",
+        nav_inflation: "Инфляция",
+        nav_tokenomics: "Токеномика",
+        hero_sub_1: "Mobile SKR · собственный актив экосистемы",
+        hero_sub_2: "открытая мобильная платформа",
+        hero_badge: "🎁 Airdrop перед пулом · 500 SKR за кошелёк",
+        airdrop_desc: "На airdrop выделено 3 000 000 монет SKR. Каждый, кто успеет нажать кнопку «Забрать монеты», получит 500 SKR (один раз на кошелёк).",
+        mission_title: "Наша миссия",
+        mission_p1: "Сегодня мобильная дуополия решает, какие приложения будут доступны, кто получит выплаты и какие правила действуют. Mobile SKR строит открытую мобильную платформу, где управление и ценность делятся между сообществом.",
+        mission_p2: "SKR — собственный актив экосистемы. Он распределяет контроль, поддерживает модерацию и выравнивает стимулы между разработчиками, пользователями и партнёрами по оборудованию.",
+        mission_p3: "С токеном SKR сообщество управляет развитием, а пользователи и разработчики получают долю создаваемой ими стоимости.",
+        card1_title: "Децентрализованное управление",
+        card1_body: "Стейк для стражей, которые проверяют устройства и курируют магазин приложений.",
+        card2_title: "Ответственность за экосистему",
+        card2_body: "Казна сообщества, гранты и инициативы по развитию протокола и мобильного стека.",
+        card3_title: "Согласованные стимулы",
+        card3_body: "Разработчики, пользователи и партнёры по железу делят upside от продукта.",
+        inflation_title: "Линейная инфляция",
+        inflation_p: "Модель эмиссии SKR поощряет ранних участников и выходит к устойчивой ставке.",
+        metric1_title: "Год 1",
+        metric1_desc: "Инфляция 10% от общего объёма (пример).",
+        metric2_title: "Ежегодный распад",
+        metric2_desc: "Снижение инфляции на 25% в год до целевой ставки.",
+        metric3_title: "Конечная ставка",
+        metric3_desc: "Долгосрочная инфляция 2% — поддерживает безопасность и развитие.",
+        inflation_chart_label: "Seeker · SKR Inflation Rate",
+        dist_chart_label: "Seeker · SKR Distribution",
+        dist_note: "Диаграмма иллюстрирует доли: airdrop, рост и партнёрства, команда, ликвидность, казначейство. Проценты смотри в таблице справа.",
+        tokenomics_title: "Токеномика",
+        table_head_cat: "Категория",
+        table_head_alloc: "Распределение",
+        table_head_unlock: "Разблокировка",
+        row1_cat: "Аирдропы",
+        row1_alloc: "30%",
+        row1_unlock: "Разблокировано при запуске",
+        row2_cat: "Рост и партнёрства",
+        row2_alloc: "25%",
+        row2_unlock: "28% при запуске, далее линейно 18 мес.",
+        row3_cat: "Команда Mobile SKR",
+        row3_alloc: "15%",
+        row3_unlock: "12-месячный cliff, 36-месячный vest",
+        row4_cat: "Ликвидность и запуск",
+        row4_alloc: "10%",
+        row4_unlock: "Разблокировано при запуске",
+        row5_cat: "Solana Labs / партнёры",
+        row5_alloc: "10%",
+        row5_unlock: "Cliff + линейный vest",
+        row6_cat: "Казначейство сообщества",
+        row6_alloc: "10%",
+        row6_unlock: "Управляется через голосование",
+        supply_html: "Общий объём: <b>10&nbsp;000&nbsp;000&nbsp;000 SKR</b><br>Токен: <b>Mobile SKR</b> · Mint: <code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>"
+      },
+      en: {
+        wallet_label_disconnected: "Wallet: not connected",
+        wallet_label_connected: "Wallet: {addr}",
+        btn_connect: "Connect wallet",
+        btn_connected: "Connected",
+        btn_claim: "Claim tokens",
+        btn_raffle: "Join 3 SOL raffle",
+        status_initial: "Connect your wallet to claim tokens and join the raffle.",
+        status_connected: "Wallet connected. You can claim tokens and join the raffle.",
+        status_connect_error: "Failed to connect wallet.",
+        status_claim_sending: "Submitting airdrop request...",
+        status_claim_error_generic: "Error: failed to claim airdrop.",
+        status_claim_network: "Network error. Please try again.",
+        status_raffle_sending: "Registering you for the 3 SOL raffle...",
+        status_raffle_error_generic: "Error while registering for the raffle.",
+        status_raffle_network: "Network error while registering for the raffle.",
+        claim_success_plain: "Success! 500 SKR have been sent to your wallet.",
+        view_tx: "view on Solscan",
+        raffle_success: "You are in the 3 SOL raffle. Total winners: 10.",
+        alert_no_wallet: "No Solana wallet found. Install Phantom, Solflare, Backpack, etc.",
+        nav_mission: "Mission",
+        nav_inflation: "Inflation",
+        nav_tokenomics: "Tokenomics",
+        hero_sub_1: "Mobile SKR · native asset of the ecosystem",
+        hero_sub_2: "open mobile platform",
+        hero_badge: "🎁 Airdrop before launch · 500 SKR per wallet",
+        airdrop_desc: "3,000,000 SKR is allocated to the airdrop. Everyone who clicks the Claim tokens button in time receives 500 SKR (one claim per wallet).",
+        mission_title: "Our Mission",
+        mission_p1: "Today's mobile duopoly decides which apps ship, who gets paid, and which rules apply. Mobile SKR is building an open mobile platform where control and value are shared with the community.",
+        mission_p2: "SKR is the native asset of the ecosystem. It distributes control, powers moderation, and aligns incentives between developers, users, and hardware partners.",
+        mission_p3: "With SKR, the community steers the roadmap, while users and builders hold a direct stake in the value they help create.",
+        card1_title: "Decentralized governance",
+        card1_body: "Stake for guardians who verify devices and curate the mobile app store.",
+        card2_title: "Ecosystem stewardship",
+        card2_body: "Community treasury, grants, and initiatives to grow the protocol and mobile stack.",
+        card3_title: "Aligned incentives",
+        card3_body: "Developers, users, and hardware partners share the upside of the product.",
+        inflation_title: "Linear inflation",
+        inflation_p: "The SKR issuance model rewards early participants and converges to a sustainable rate.",
+        metric1_title: "Year 1",
+        metric1_desc: "10% inflation of total supply (example).",
+        metric2_title: "Annual decay",
+        metric2_desc: "Inflation decreases by 25% each year until the target rate.",
+        metric3_title: "Terminal rate",
+        metric3_desc: "Long-term 2% inflation keeps the network secure and evolving.",
+        inflation_chart_label: "Seeker · SKR Inflation Rate",
+        dist_chart_label: "Seeker · SKR Distribution",
+        dist_note: "The chart illustrates the allocation between airdrops, growth and partnerships, team, liquidity, and treasury. Percentages are shown in the table.",
+        tokenomics_title: "Tokenomics",
+        table_head_cat: "Category",
+        table_head_alloc: "Allocation",
+        table_head_unlock: "Unlock schedule",
+        row1_cat: "Airdrops",
+        row1_alloc: "30%",
+        row1_unlock: "Unlocked at launch",
+        row2_cat: "Growth & partnerships",
+        row2_alloc: "25%",
+        row2_unlock: "28% at launch, then linear over 18 months",
+        row3_cat: "Mobile SKR team",
+        row3_alloc: "15%",
+        row3_unlock: "12-month cliff, 36-month vest",
+        row4_cat: "Liquidity & launch",
+        row4_alloc: "10%",
+        row4_unlock: "Unlocked at launch",
+        row5_cat: "Solana Labs / partners",
+        row5_alloc: "10%",
+        row5_unlock: "Cliff + linear vest",
+        row6_cat: "Community treasury",
+        row6_alloc: "10%",
+        row6_unlock: "Governed by token holders",
+        supply_html: "Total supply: <b>10,000,000,000 SKR</b><br>Token: <b>Mobile SKR</b> · Mint: <code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>"
+      },
+      de: {
+        wallet_label_disconnected: "Wallet: nicht verbunden",
+        wallet_label_connected: "Wallet: {addr}",
+        btn_connect: "Wallet verbinden",
+        btn_connected: "Verbunden",
+        btn_claim: "Token abholen",
+        btn_raffle: "An 3-SOL-Gewinnspiel teilnehmen",
+        status_initial: "Verbinde dein Wallet, um Token zu erhalten und am Gewinnspiel teilzunehmen.",
+        status_connected: "Wallet verbunden. Du kannst Token abholen und am Gewinnspiel teilnehmen.",
+        status_connect_error: "Wallet-Verbindung fehlgeschlagen.",
+        status_claim_sending: "Airdrop-Anfrage wird gesendet...",
+        status_claim_error_generic: "Fehler: Airdrop konnte nicht beansprucht werden.",
+        status_claim_network: "Netzwerkfehler. Bitte versuche es erneut.",
+        status_raffle_sending: "Du wirst für das 3-SOL-Gewinnspiel registriert...",
+        status_raffle_error_generic: "Fehler bei der Registrierung für das Gewinnspiel.",
+        status_raffle_network: "Netzwerkfehler bei der Registrierung für das Gewinnspiel.",
+        claim_success_plain: "Erfolg! 500 SKR wurden an dein Wallet gesendet.",
+        view_tx: "auf Solscan ansehen",
+        raffle_success: "Du nimmst am 3-SOL-Gewinnspiel teil. Insgesamt 10 Gewinner.",
+        alert_no_wallet: "Kein Solana-Wallet gefunden. Installiere Phantom, Solflare, Backpack usw.",
+        nav_mission: "Mission",
+        nav_inflation: "Inflation",
+        nav_tokenomics: "Tokenomics",
+        hero_sub_1: "Mobile SKR · nativer Vermögenswert des Ökosystems",
+        hero_sub_2: "offene mobile Plattform",
+        hero_badge: "🎁 Airdrop vor dem Launch · 500 SKR pro Wallet",
+        airdrop_desc: "Für den Airdrop sind 3.000.000 SKR reserviert. Jeder, der rechtzeitig auf die Schaltfläche Token abholen klickt, erhält 500 SKR (einmal pro Wallet).",
+        mission_title: "Unsere Mission",
+        mission_p1: "Die heutige mobile Duopol-Struktur entscheidet, welche Apps erscheinen, wer bezahlt wird und welche Regeln gelten. Mobile SKR baut eine offene mobile Plattform, in der Kontrolle und Wert mit der Community geteilt werden.",
+        mission_p2: "SKR ist der native Vermögenswert des Ökosystems. Er verteilt Kontrolle, ermöglicht Moderation und richtet die Anreize von Entwicklern, Nutzern und Hardware-Partnern aus.",
+        mission_p3: "Mit SKR steuert die Community die Roadmap, und Nutzer sowie Entwickler halten einen direkten Anteil am geschaffenen Wert.",
+        card1_title: "Dezentrale Governance",
+        card1_body: "Staking für Guardians, die Geräte verifizieren und den App-Store kuratieren.",
+        card2_title: "Ecosystem-Stewardship",
+        card2_body: "Community-Treasury, Grants und Initiativen für das Wachstum des Protokolls und des mobilen Stacks.",
+        card3_title: "Ausgerichtete Anreize",
+        card3_body: "Entwickler, Nutzer und Hardware-Partner teilen sich das Upside des Produkts.",
+        inflation_title: "Lineare Inflation",
+        inflation_p: "Das SKR-Emissionsmodell belohnt frühe Teilnehmer und konvergiert zu einer nachhaltigen Rate.",
+        metric1_title: "Jahr 1",
+        metric1_desc: "10% Inflation der Gesamtmenge (Beispiel).",
+        metric2_title: "Jährlicher Abbau",
+        metric2_desc: "Die Inflation sinkt jedes Jahr um 25%, bis die Zielrate erreicht ist.",
+        metric3_title: "Endrate",
+        metric3_desc: "Langfristige 2%-Inflation erhält Sicherheit und Entwicklung.",
+        inflation_chart_label: "Seeker · SKR Inflationsrate",
+        dist_chart_label: "Seeker · SKR Verteilung",
+        dist_note: "Das Diagramm zeigt die Verteilung auf Airdrops, Wachstum & Partnerschaften, Team, Liquidität und Treasury. Die Prozentsätze stehen in der Tabelle.",
+        tokenomics_title: "Tokenomics",
+        table_head_cat: "Kategorie",
+        table_head_alloc: "Verteilung",
+        table_head_unlock: "Vesting-Plan",
+        row1_cat: "Airdrops",
+        row1_alloc: "30%",
+        row1_unlock: "Beim Launch freigeschaltet",
+        row2_cat: "Wachstum & Partnerschaften",
+        row2_alloc: "25%",
+        row2_unlock: "28% beim Launch, dann linear über 18 Monate",
+        row3_cat: "Mobile-SKR-Team",
+        row3_alloc: "15%",
+        row3_unlock: "12-Monats-Cliff, 36-Monats-Vesting",
+        row4_cat: "Liquidität & Launch",
+        row4_alloc: "10%",
+        row4_unlock: "Beim Launch freigeschaltet",
+        row5_cat: "Solana Labs / Partner",
+        row5_alloc: "10%",
+        row5_unlock: "Cliff + lineares Vesting",
+        row6_cat: "Community-Treasury",
+        row6_alloc: "10%",
+        row6_unlock: "Durch Tokenholder gesteuert",
+        supply_html: "Gesamtmenge: <b>10.000.000.000 SKR</b><br>Token: <b>Mobile SKR</b> · Mint: <code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>"
+      },
+      zh: {
+        wallet_label_disconnected: "钱包：未连接",
+        wallet_label_connected: "钱包：{addr}",
+        btn_connect: "连接钱包",
+        btn_connected: "已连接",
+        btn_claim: "领取代币",
+        btn_raffle: "参加 3 SOL 抽奖",
+        status_initial: "连接钱包即可领取代币并参加抽奖。",
+        status_connected: "钱包已连接，可以领取代币并参加抽奖。",
+        status_connect_error: "钱包连接失败。",
+        status_claim_sending: "正在提交空投请求...",
+        status_claim_error_generic: "错误：领取空投失败。",
+        status_claim_network: "网络错误，请重试。",
+        status_raffle_sending: "正在为你登记 3 SOL 抽奖...",
+        status_raffle_error_generic: "登记抽奖时出错。",
+        status_raffle_network: "登记抽奖时发生网络错误。",
+        claim_success_plain: "成功！500 SKR 已发送到你的钱包。",
+        view_tx: "在 Solscan 查看",
+        raffle_success: "你已参加 3 SOL 抽奖，共 10 名获奖者。",
+        alert_no_wallet: "未检测到 Solana 钱包，请安装 Phantom、Solflare、Backpack 等。",
+        nav_mission: "使命",
+        nav_inflation: "通胀",
+        nav_tokenomics: "代币经济",
+        hero_sub_1: "Mobile SKR · 生态系统原生资产",
+        hero_sub_2: "开放的移动平台",
+        hero_badge: "🎁 上线前空投 · 每个钱包 500 SKR",
+        airdrop_desc: "本次空投共分配 3,000,000 枚 SKR。只要在活动期间点击“领取代币”按钮，每个钱包即可领取 500 SKR（限领一次）。",
+        mission_title: "我们的使命",
+        mission_p1: "今天的移动双头垄断决定了哪些应用可以上架、谁能获得收益以及适用哪些规则。Mobile SKR 正在打造一个开放的移动平台，把控制权和价值交给社区。",
+        mission_p2: "SKR 是生态系统的原生资产，用于分配控制权、支持内容审核，并让开发者、用户和硬件伙伴的激励保持一致。",
+        mission_p3: "通过 SKR，社区共同决定发展方向，用户和建设者直接持有他们创造的价值份额。",
+        card1_title: "去中心化治理",
+        card1_body: "质押给守护者，用于验证设备并管理去中心化应用商店。",
+        card2_title: "生态管理",
+        card2_body: "社区金库、生态基金和用于发展协议及移动栈的计划。",
+        card3_title: "激励对齐",
+        card3_body: "开发者、用户和硬件伙伴共同分享产品增长带来的收益。",
+        inflation_title: "线性通胀",
+        inflation_p: "SKR 的发行模型奖励早期参与者，并逐步收敛到可持续的通胀率。",
+        metric1_title: "第 1 年",
+        metric1_desc: "总供应量 10% 的通胀（示例）。",
+        metric2_title: "年度衰减",
+        metric2_desc: "每年通胀率递减 25%，直到达到目标水平。",
+        metric3_title: "终局通胀率",
+        metric3_desc: "长期 2% 通胀，用于保障网络安全和持续发展。",
+        inflation_chart_label: "Seeker · SKR 通胀率",
+        dist_chart_label: "Seeker · SKR 分配",
+        dist_note: "图表展示了空投、增长与合作、团队、流动性和金库之间的大致分配。具体百分比见右侧表格。",
+        tokenomics_title: "代币经济",
+        table_head_cat: "类别",
+        table_head_alloc: "分配",
+        table_head_unlock: "解锁计划",
+        row1_cat: "空投",
+        row1_alloc: "30%",
+        row1_unlock: "上线时解锁",
+        row2_cat: "增长与合作",
+        row2_alloc: "25%",
+        row2_unlock: "上线解锁 28%，其余 18 个月线性释放",
+        row3_cat: "Mobile SKR 团队",
+        row3_alloc: "15%",
+        row3_unlock: "12 个月悬崖期，36 个月线性释放",
+        row4_cat: "流动性与启动",
+        row4_alloc: "10%",
+        row4_unlock: "上线时解锁",
+        row5_cat: "Solana Labs / 合作伙伴",
+        row5_alloc: "10%",
+        row5_unlock: "悬崖期 + 线性释放",
+        row6_cat: "社区金库",
+        row6_alloc: "10%",
+        row6_unlock: "由代币持有者治理",
+        supply_html: "总供应量：<b>10,000,000,000 SKR</b><br>代币：<b>Mobile SKR</b> · 铸造地址：<code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>"
+      },
+      ja: {
+        wallet_label_disconnected: "ウォレット: 未接続",
+        wallet_label_connected: "ウォレット: {addr}",
+        btn_connect: "ウォレットを接続",
+        btn_connected: "接続済み",
+        btn_claim: "トークンを受け取る",
+        btn_raffle: "3 SOL 抽選に参加",
+        status_initial: "ウォレットを接続して、トークンを受け取り抽選に参加しよう。",
+        status_connected: "ウォレットが接続されました。トークン受取と抽選参加ができます。",
+        status_connect_error: "ウォレットの接続に失敗しました。",
+        status_claim_sending: "エアドロップ申請を送信中...",
+        status_claim_error_generic: "エラー: エアドロップを受け取れませんでした。",
+        status_claim_network: "ネットワークエラーです。もう一度お試しください。",
+        status_raffle_sending: "3 SOL 抽選への参加を登録中...",
+        status_raffle_error_generic: "抽選登録中にエラーが発生しました。",
+        status_raffle_network: "抽選登録中にネットワークエラーが発生しました。",
+        claim_success_plain: "成功！500 SKR があなたのウォレットに送信されました。",
+        view_tx: "Solscan で表示",
+        raffle_success: "3 SOL 抽選に参加しました。合計 10 名が当選します。",
+        alert_no_wallet: "Solana ウォレットが見つかりません。Phantom や Solflare、Backpack などをインストールしてください。",
+        nav_mission: "ミッション",
+        nav_inflation: "インフレ",
+        nav_tokenomics: "トークノミクス",
+        hero_sub_1: "Mobile SKR · エコシステムのネイティブ資産",
+        hero_sub_2: "オープンなモバイルプラットフォーム",
+        hero_badge: "🎁 ローンチ前エアドロップ · 1 ウォレットあたり 500 SKR",
+        airdrop_desc: "このエアドロップには合計 3,000,000 SKR が割り当てられています。期間中にトークンを受け取るボタンを押したウォレットごとに 500 SKR を 1 回まで受け取ることができます。",
+        mission_title: "私たちのミッション",
+        mission_p1: "現在のモバイル市場の二極化により、どのアプリが公開され、誰が報酬を受け取り、どんなルールが適用されるかが決められています。Mobile SKR は、コミュニティとコントロールや価値を共有するオープンなモバイルプラットフォームを構築します。",
+        mission_p2: "SKR はエコシステムのネイティブトークンであり、ガバナンスやモデレーションを支え、開発者・ユーザー・ハードウェアパートナーのインセンティブを揃えます。",
+        mission_p3: "SKR によってコミュニティがロードマップを決め、ユーザーとビルダーは自分たちが生み出した価値に直接参加できます。",
+        card1_title: "分散型ガバナンス",
+        card1_body: "デバイスを検証し、アプリストアをキュレーションするガーディアンのためのステーキング。",
+        card2_title: "エコシステム運営",
+        card2_body: "コミュニティトレジャリー、助成金、プロトコルとモバイルスタックを成長させるためのイニシアチブ。",
+        card3_title: "インセンティブの整合",
+        card3_body: "開発者・ユーザー・ハードウェアパートナーがプロダクトの成長の恩恵を共にシェアします。",
+        inflation_title: "線形インフレ",
+        inflation_p: "SKR の発行モデルは、初期参加者を報酬し、最終的に持続可能なインフレ率へと収束します。",
+        metric1_title: "1 年目",
+        metric1_desc: "総供給量の 10% のインフレ率（例）。",
+        metric2_title: "年間減衰",
+        metric2_desc: "インフレ率は毎年 25% ずつ減少し、目標レートに近づきます。",
+        metric3_title: "最終レート",
+        metric3_desc: "長期的な 2% のインフレ率がネットワークの安全性と成長を支えます。",
+        inflation_chart_label: "Seeker · SKR インフレ率",
+        dist_chart_label: "Seeker · SKR 配分",
+        dist_note: "チャートはエアドロップ、成長とパートナー、チーム、流動性、トレジャリーへのおおよその配分を示します。詳細な割合は表を参照。",
+        tokenomics_title: "トークノミクス",
+        table_head_cat: "カテゴリ",
+        table_head_alloc: "配分",
+        table_head_unlock: "アンロックスケジュール",
+        row1_cat: "エアドロップ",
+        row1_alloc: "30%",
+        row1_unlock: "ローンチ時にアンロック",
+        row2_cat: "成長とパートナーシップ",
+        row2_alloc: "25%",
+        row2_unlock: "ローンチ時に 28%、残りは 18 ヶ月で線形に解放",
+        row3_cat: "Mobile SKR チーム",
+        row3_alloc: "15%",
+        row3_unlock: "12 ヶ月クリフ、36 ヶ月ベスティング",
+        row4_cat: "流動性とローンチ",
+        row4_alloc: "10%",
+        row4_unlock: "ローンチ時にアンロック",
+        row5_cat: "Solana Labs / パートナー",
+        row5_alloc: "10%",
+        row5_unlock: "クリフ + 線形ベスティング",
+        row6_cat: "コミュニティトレジャリー",
+        row6_alloc: "10%",
+        row6_unlock: "トークンホルダーによるガバナンス",
+        supply_html: "総供給量: <b>10,000,000,000 SKR</b><br>トークン: <b>Mobile SKR</b> · ミント: <code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>"
+      },
+      uk: {
+        wallet_label_disconnected: "Гаманець: не підключено",
+        wallet_label_connected: "Гаманець: {addr}",
+        btn_connect: "Підключити гаманець",
+        btn_connected: "Підключено",
+        btn_claim: "Забрати токени",
+        btn_raffle: "Узяти участь у розіграші 3 SOL",
+        status_initial: "Підключи гаманець, щоб забрати токени та взяти участь у розіграші.",
+        status_connected: "Гаманець підключено. Можна забирати токени та брати участь у розіграші.",
+        status_connect_error: "Помилка підключення гаманця.",
+        status_claim_sending: "Надсилаю запит на airdrop...",
+        status_claim_error_generic: "Помилка: не вдалося отримати airdrop.",
+        status_claim_network: "Помилка мережі. Спробуй ще раз.",
+        status_raffle_sending: "Реєструю участь у розіграші 3 SOL...",
+        status_raffle_error_generic: "Помилка під час реєстрації в розіграші.",
+        status_raffle_network: "Помилка мережі під час реєстрації в розіграші.",
+        claim_success_plain: "Успіх! 500 SKR надіслано на твій гаманець.",
+        view_tx: "переглянути в Solscan",
+        raffle_success: "Ти береш участь у розіграші 3 SOL. Всього переможців: 10.",
+        alert_no_wallet: "Не знайдено жодного Solana-гаманця. Встанови Phantom, Solflare, Backpack тощо.",
+        nav_mission: "Місія",
+        nav_inflation: "Інфляція",
+        nav_tokenomics: "Токеноміка",
+        hero_sub_1: "Mobile SKR · власний актив екосистеми",
+        hero_sub_2: "відкрита мобільна платформа",
+        hero_badge: "🎁 Airdrop перед пулом · 500 SKR за гаманець",
+        airdrop_desc: "На airdrop виділено 3 000 000 монет SKR. Кожен, хто встигне натиснути кнопку «Забрати токени», отримує 500 SKR (один раз на гаманець).",
+        mission_title: "Наша місія",
+        mission_p1: "Сьогодні мобільна дуополія вирішує, які застосунки будуть доступні, хто отримає виплати та які правила діють. Mobile SKR будує відкриту мобільну платформу, де контроль і цінність розділено з комʼюніті.",
+        mission_p2: "SKR — власний актив екосистеми. Він розподіляє контроль, підтримує модерацію та вирівнює стимули між розробниками, користувачами й партнерами по обладнанню.",
+        mission_p3: "З токеном SKR спільнота керує розвитком, а користувачі й розробники отримують частку створеної ними вартості.",
+        card1_title: "Децентралізоване управління",
+        card1_body: "Стейк для стражів, які перевіряють пристрої та курують магазин застосунків.",
+        card2_title: "Відповідальність за екосистему",
+        card2_body: "Казна спільноти, гранти та ініціативи для розвитку протоколу й мобільного стека.",
+        card3_title: "Узгоджені стимули",
+        card3_body: "Розробники, користувачі та партнери по залізу ділять апсайд від продукту.",
+        inflation_title: "Лінійна інфляція",
+        inflation_p: "Модель емісії SKR винагороджує ранніх учасників і виходить на стійку ставку.",
+        metric1_title: "Рік 1",
+        metric1_desc: "10% інфляції від загальної пропозиції (приклад).",
+        metric2_title: "Щорічне зниження",
+        metric2_desc: "Інфляція щороку зменшується на 25% до цільової ставки.",
+        metric3_title: "Кінцева ставка",
+        metric3_desc: "Довгострокова інфляція 2% підтримує безпеку та розвиток мережі.",
+        inflation_chart_label: "Seeker · Ставка інфляції SKR",
+        dist_chart_label: "Seeker · Розподіл SKR",
+        dist_note: "Діаграма показує розподіл між airdrop, ростом і партнерствами, командою, ліквідністю та казначейством. Відсотки — у таблиці праворуч.",
+        tokenomics_title: "Токеноміка",
+        table_head_cat: "Категорія",
+        table_head_alloc: "Розподіл",
+        table_head_unlock: "Розблокування",
+        row1_cat: "Airdrop",
+        row1_alloc: "30%",
+        row1_unlock: "Розблоковано під час запуску",
+        row2_cat: "Ріст та партнерства",
+        row2_alloc: "25%",
+        row2_unlock: "28% при запуску, решта — лінійно за 18 місяців",
+        row3_cat: "Команда Mobile SKR",
+        row3_alloc: "15%",
+        row3_unlock: "12-місячний cliff, 36-місячний vest",
+        row4_cat: "Ліквідність і запуск",
+        row4_alloc: "10%",
+        row4_unlock: "Розблоковано під час запуску",
+        row5_cat: "Solana Labs / партнери",
+        row5_alloc: "10%",
+        row5_unlock: "Cliff + лінійний vest",
+        row6_cat: "Казначейство спільноти",
+        row6_alloc: "10%",
+        row6_unlock: "Керується токен-холдерами",
+        supply_html: "Загальна пропозиція: <b>10&nbsp;000&nbsp;000&nbsp;000 SKR</b><br>Токен: <b>Mobile SKR</b> · Mint: <code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>"
+      },
+      pl: {
+        wallet_label_disconnected: "Portfel: niepołączony",
+        wallet_label_connected: "Portfel: {addr}",
+        btn_connect: "Połącz portfel",
+        btn_connected: "Połączono",
+        btn_claim: "Odbierz tokeny",
+        btn_raffle: "Weź udział w losowaniu 3 SOL",
+        status_initial: "Połącz portfel, aby odebrać tokeny i wziąć udział w losowaniu.",
+        status_connected: "Portfel połączony. Możesz odebrać tokeny i dołączyć do losowania.",
+        status_connect_error: "Nie udało się połączyć portfela.",
+        status_claim_sending: "Wysyłam żądanie airdropu...",
+        status_claim_error_generic: "Błąd: nie udało się odebrać airdropu.",
+        status_claim_network: "Błąd sieci. Spróbuj ponownie.",
+        status_raffle_sending: "Rejestruję udział w losowaniu 3 SOL...",
+        status_raffle_error_generic: "Błąd podczas rejestracji do losowania.",
+        status_raffle_network: "Błąd sieci podczas rejestracji do losowania.",
+        claim_success_plain: "Sukces! 500 SKR zostało wysłanych na twój portfel.",
+        view_tx: "zobacz w Solscan",
+        raffle_success: "Bierzesz udział w losowaniu 3 SOL. Łącznie 10 zwycięzców.",
+        alert_no_wallet: "Nie znaleziono portfela Solana. Zainstaluj Phantom, Solflare, Backpack itd.",
+        nav_mission: "Misja",
+        nav_inflation: "Inflacja",
+        nav_tokenomics: "Tokenomika",
+        hero_sub_1: "Mobile SKR · natywny aktyw ekosystemu",
+        hero_sub_2: "otwarta platforma mobilna",
+        hero_badge: "🎁 Airdrop przed pulą · 500 SKR na portfel",
+        airdrop_desc: "Na airdrop przeznaczono 3 000 000 tokenów SKR. Każdy, kto zdąży kliknąć przycisk Odbierz tokeny, otrzyma 500 SKR (raz na portfel).",
+        mission_title: "Nasza misja",
+        mission_p1: "Dzisiejszy duopol mobilny decyduje, które aplikacje się pojawią, kto dostanie wypłaty i jakie zasady obowiązują. Mobile SKR buduje otwartą platformę mobilną, w której kontrola i wartość są współdzielone z społecznością.",
+        mission_p2: "SKR to natywny token ekosystemu. Rozdziela kontrolę, wspiera moderację i wyrównuje bodźce pomiędzy deweloperami, użytkownikami i partnerami sprzętowymi.",
+        mission_p3: "Dzięki SKR społeczność wyznacza kierunek rozwoju, a użytkownicy i twórcy mają udział w wartości, którą współtworzą.",
+        card1_title: "Zdecentralizowane zarządzanie",
+        card1_body: "Staking dla strażników, którzy weryfikują urządzenia i kuratorują sklep z aplikacjami.",
+        card2_title: "Opieka nad ekosystemem",
+        card2_body: "Skarbiec społeczności, granty oraz inicjatywy rozwoju protokołu i mobilnego stosu.",
+        card3_title: "Zbieżne bodźce",
+        card3_body: "Deweloperzy, użytkownicy i partnerzy sprzętowi dzielą się wzrostem wartości produktu.",
+        inflation_title: "Liniowa inflacja",
+        inflation_p: "Model emisji SKR nagradza wczesnych uczestników i dąży do stabilnej stopy inflacji.",
+        metric1_title: "Rok 1",
+        metric1_desc: "Inflacja 10% całkowitej podaży (przykład).",
+        metric2_title: "Roczny spadek",
+        metric2_desc: "Inflacja spada o 25% rocznie, aż do osiągnięcia stopy docelowej.",
+        metric3_title: "Stopa końcowa",
+        metric3_desc: "Długoterminowa inflacja 2% utrzymuje bezpieczeństwo i rozwój sieci.",
+        inflation_chart_label: "Seeker · stopa inflacji SKR",
+        dist_chart_label: "Seeker · podział SKR",
+        dist_note: "Wykres pokazuje przybliżony podział pomiędzy airdropem, wzrostem i partnerstwami, zespołem, płynnością i skarbcem. Dokładne procenty znajdują się w tabeli.",
+        tokenomics_title: "Tokenomika",
+        table_head_cat: "Kategoria",
+        table_head_alloc: "Udział",
+        table_head_unlock: "Odblokowanie",
+        row1_cat: "Airdropy",
+        row1_alloc: "30%",
+        row1_unlock: "Odblokowane przy starcie",
+        row2_cat: "Wzrost i partnerstwa",
+        row2_alloc: "25%",
+        row2_unlock: "28% przy starcie, reszta liniowo przez 18 miesięcy",
+        row3_cat: "Zespół Mobile SKR",
+        row3_alloc: "15%",
+        row3_unlock: "12-miesięczny cliff, 36-miesięczne vesting",
+        row4_cat: "Płynność i start",
+        row4_alloc: "10%",
+        row4_unlock: "Odblokowane przy starcie",
+        row5_cat: "Solana Labs / partnerzy",
+        row5_alloc: "10%",
+        row5_unlock: "Cliff + liniowy vesting",
+        row6_cat: "Skarbiec społeczności",
+        row6_alloc: "10%",
+        row6_unlock: "Zarządzany przez posiadaczy tokena",
+        supply_html: "Całkowita podaż: <b>10&nbsp;000&nbsp;000&nbsp;000 SKR</b><br>Token: <b>Mobile SKR</b> · Mint: <code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>"
+      },
+      ar: {
+        wallet_label_disconnected: "المحفظة: غير متصلة",
+        wallet_label_connected: "المحفظة: {addr}",
+        btn_connect: "اتصال بالمحفظة",
+        btn_connected: "متصل",
+        btn_claim: "استلام الرموز",
+        btn_raffle: "المشاركة في سحب 3 SOL",
+        status_initial: "قم بتوصيل محفظتك لاستلام الرموز والمشاركة في السحب.",
+        status_connected: "تم توصيل المحفظة. يمكنك الآن استلام الرموز والمشاركة في السحب.",
+        status_connect_error: "فشل في توصيل المحفظة.",
+        status_claim_sending: "جاري إرسال طلب الإنزال الجوي...",
+        status_claim_error_generic: "خطأ: تعذّر استلام الإنزال الجوي.",
+        status_claim_network: "خطأ في الشبكة. حاول مرة أخرى.",
+        status_raffle_sending: "جاري تسجيلك في سحب 3 SOL...",
+        status_raffle_error_generic: "حدث خطأ أثناء التسجيل في السحب.",
+        status_raffle_network: "خطأ في الشبكة أثناء التسجيل في السحب.",
+        claim_success_plain: "تم بنجاح! تم إرسال 500 SKR إلى محفظتك.",
+        view_tx: "عرض على Solscan",
+        raffle_success: "أنت مشارك في سحب 3 SOL. عدد الفائزين: 10.",
+        alert_no_wallet: "لم يتم العثور على أي محفظة Solana. يرجى تثبيت Phantom أو Solflare أو Backpack وغير ذلك.",
+        nav_mission: "الرؤية",
+        nav_inflation: "التضخم",
+        nav_tokenomics: "اقتصاد الرمز",
+        hero_sub_1: "Mobile SKR · الأصل الأصلي للنظام البيئي",
+        hero_sub_2: "منصّة جوال مفتوحة",
+        hero_badge: "🎁 إنزال جوي قبل الإطلاق · 500 SKR لكل محفظة",
+        airdrop_desc: "تم تخصيص 3,000,000 من عملة SKR لهذا الإنزال الجوي. كل من يضغط زر استلام الرموز في الوقت المحدد يحصل على 500 SKR (مرة واحدة لكل محفظة).",
+        mission_title: "مهمتنا",
+        mission_p1: "اليوم يقرّر احتكار الهواتف المحمولة أي التطبيقات تُطلق، ومن يحصل على الدخل، وأي القواعد تنطبق. يهدف Mobile SKR إلى بناء منصّة جوال مفتوحة يتقاسم فيها المجتمع السيطرة والقيمة.",
+        mission_p2: "يُعد SKR الأصل الأصلي للنظام البيئي؛ فهو يوزّع التحكم، ويدعم الإشراف، ويوحّد الحوافز بين المطوّرين والمستخدمين وشركاء العتاد.",
+        mission_p3: "مع SKR يقود المجتمع خارطة الطريق، ويحصل المستخدمون والبنّاؤون على حصة مباشرة من القيمة التي يخلقونها.",
+        card1_title: "حوكمة لامركزية",
+        card1_body: "تخزين للحراس الذين يتحققون من الأجهزة ويختارون التطبيقات في المتجر.",
+        card2_title: "رعاية النظام البيئي",
+        card2_body: "خزينة المجتمع، المنح، ومبادرات تطوير البروتوكول وحزمة الهاتف.",
+        card3_title: "حوافز متوافقة",
+        card3_body: "يتقاسم المطوّرون والمستخدمون وشركاء العتاد عائد نمو المنتج.",
+        inflation_title: "تضخم خطّي",
+        inflation_p: "يكافئ نموذج إصدار SKR المشاركين الأوائل ويتقارب نحو معدل تضخم مستدام.",
+        metric1_title: "السنة 1",
+        metric1_desc: "تضخم بنسبة 10٪ من إجمالي المعروض (مثال).",
+        metric2_title: "انخفاض سنوي",
+        metric2_desc: "ينخفض التضخم بنسبة 25٪ كل سنة حتى الوصول إلى المعدل المستهدف.",
+        metric3_title: "المعدل النهائي",
+        metric3_desc: "تضخم طويل الأجل بنسبة 2٪ يحافظ على أمان الشبكة وتطورها.",
+        inflation_chart_label: "Seeker · معدل تضخم SKR",
+        dist_chart_label: "Seeker · توزيع SKR",
+        dist_note: "يوضح المخطط التوزيع التقريبي بين الإنزال الجوي، النمو والشراكات، الفريق، السيولة، والخزينة. النِسَب الدقيقة في الجدول.",
+        tokenomics_title: "اقتصاد الرمز",
+        table_head_cat: "الفئة",
+        table_head_alloc: "النسبة",
+        table_head_unlock: "جدول الفتح",
+        row1_cat: "إنزال جوي",
+        row1_alloc: "30٪",
+        row1_unlock: "تُفتح عند الإطلاق",
+        row2_cat: "النمو والشراكات",
+        row2_alloc: "25٪",
+        row2_unlock: "28٪ عند الإطلاق، والباقي خطّي خلال 18 شهرًا",
+        row3_cat: "فريق Mobile SKR",
+        row3_alloc: "15٪",
+        row3_unlock: "فترة حجز 12 شهرًا ثم استحقاق على 36 شهرًا",
+        row4_cat: "السيولة والإطلاق",
+        row4_alloc: "10٪",
+        row4_unlock: "تُفتح عند الإطلاق",
+        row5_cat: "Solana Labs / الشركاء",
+        row5_alloc: "10٪",
+        row5_unlock: "حجز ثم استحقاق خطّي",
+        row6_cat: "خزينة المجتمع",
+        row6_alloc: "10٪",
+        row6_unlock: "تُدار عن طريق حاملي الرمز",
+        supply_html: "إجمالي المعروض: <b>10,000,000,000 SKR</b><br>الرمز: <b>Mobile SKR</b> · العنوان: <code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>"
+      }
+    };
+
+    let currentLang = "ru";
+    let currentStatusKey = "status_initial";
+
+    function t(key) {
+      const pack = translations[currentLang] || translations.en;
+      if (pack && Object.prototype.hasOwnProperty.call(pack, key)) return pack[key];
+      if (translations.en && Object.prototype.hasOwnProperty.call(translations.en, key)) return translations.en[key];
+      return "";
+    }
 
     function formatShort(addr) {
       return addr.slice(0, 4) + "..." + addr.slice(-4);
     }
 
-    function updateUiConnected() {
-      const short = formatShort(walletAddress);
-      addrEl.textContent = "Кошелёк: " + short;
-      connectBtn.textContent = "Подключён";
-      connectBtn.disabled = true;
-      claimBtn.disabled = false;
-      raffleBtn.disabled = false;
-      statusEl.textContent = "Кошелёк подключён. Можно забирать монеты и участвовать в розыгрыше.";
+    function updateButtonsText() {
+      if (!connectBtn || !claimBtn || !raffleBtn) return;
+      connectBtn.textContent = walletAddress ? t("btn_connected") : t("btn_connect");
+      claimBtn.textContent = t("btn_claim");
+      raffleBtn.textContent = t("btn_raffle");
     }
 
+    function updateWalletLabel() {
+      if (!addrEl) return;
+      if (walletAddress) {
+        const shortAddr = formatShort(walletAddress);
+        addrEl.textContent = t("wallet_label_connected").replace("{addr}", shortAddr);
+      } else {
+        addrEl.textContent = t("wallet_label_disconnected");
+      }
+    }
+
+    function setStatusKey(key, skipStore) {
+      if (!skipStore) currentStatusKey = key;
+      if (!statusEl) return;
+      statusEl.textContent = t(key);
+    }
+
+    function applyStaticTranslations() {
+      document.documentElement.lang = currentLang;
+      document.body.dir = currentLang === "ar" ? "rtl" : "ltr";
+
+      document.querySelectorAll("[data-i18n]").forEach(function (el) {
+        const key = el.getAttribute("data-i18n");
+        const isHtml = el.getAttribute("data-i18n-html") === "1";
+        const value = t(key);
+        if (isHtml) {
+          el.innerHTML = value;
+        } else {
+          el.textContent = value;
+        }
+      });
+
+      updateButtonsText();
+      updateWalletLabel();
+
+      if (currentStatusKey) {
+        setStatusKey(currentStatusKey, true);
+      } else if (!statusEl.textContent && !statusEl.innerHTML) {
+        setStatusKey("status_initial");
+      }
+    }
+
+    if (langSelect) {
+      langSelect.value = currentLang;
+      langSelect.addEventListener("change", function (e) {
+        currentLang = e.target.value || "ru";
+        applyStaticTranslations();
+      });
+    }
+
+    // Первичная инициализация текстов
+    applyStaticTranslations();
+
+    // ===== WALLET & BACKEND =====
     async function connectWallet() {
       try {
-        // поддерживаем несколько кошельков браузера
         const candidates = [];
 
-        if (window.phantom?.solana?.isPhantom) {
+        if (window.phantom && window.phantom.solana && window.phantom.solana.isPhantom) {
           candidates.push({ name: "Phantom", provider: window.phantom.solana });
         }
-        if (window.solflare?.isSolflare) {
+        if (window.solflare && window.solflare.isSolflare) {
           candidates.push({ name: "Solflare", provider: window.solflare });
         }
-        if (window.backpack?.solana) {
+        if (window.backpack && window.backpack.solana) {
           candidates.push({ name: "Backpack", provider: window.backpack.solana });
         }
         if (window.glowSolana) {
           candidates.push({ name: "Glow", provider: window.glowSolana });
         }
-        if (window.trustWallet?.solana) {
+        if (window.trustWallet && window.trustWallet.solana) {
           candidates.push({ name: "Trust", provider: window.trustWallet.solana });
         }
-        // запасной вариант – любое window.solana
-        if (window.solana && !candidates.length) {
+        if (!candidates.length && window.solana) {
           candidates.push({ name: "Solana", provider: window.solana });
         }
 
         if (!candidates.length) {
-          alert("Не найден ни один Solana-кошелёк. Установи Phantom, Solflare, Backpack и т.п.");
+          alert(t("alert_no_wallet") || "No Solana wallet found.");
           return;
         }
 
-        // берём первый доступный провайдер
         const chosen = candidates[0];
         const provider = chosen.provider;
 
         const resp = await provider.connect();
-        const pubkey = resp?.publicKey || provider.publicKey;
-        if (!pubkey) throw new Error("Не удалось получить publicKey");
+        const pubkey = resp && resp.publicKey ? resp.publicKey : provider.publicKey;
+        if (!pubkey) throw new Error("No publicKey");
 
         walletProvider = provider;
         walletAddress = pubkey.toString();
-        updateUiConnected();
+
+        updateWalletLabel();
+        updateButtonsText();
+        claimBtn.disabled = false;
+        raffleBtn.disabled = false;
+        setStatusKey("status_connected");
       } catch (e) {
         console.error(e);
-        statusEl.textContent = "Ошибка подключения кошелька.";
+        setStatusKey("status_connect_error");
       }
     }
 
     async function claimAirdrop() {
       if (!walletAddress) return;
       claimBtn.disabled = true;
-      statusEl.textContent = "Отправляю заявку на аирдроп...";
+      setStatusKey("status_claim_sending");
 
       try {
         const res = await fetch("/api/claim", {
@@ -878,27 +1531,36 @@
           body: JSON.stringify({ wallet: walletAddress })
         });
 
-        const data = await res.json().catch(() => ({}));
+        const data = await res.json().catch(function () { return {}; });
 
         if (!res.ok) {
-          statusEl.textContent =
-            "Ошибка: " + (data.error || "не удалось получить аирдроп");
+          const msg = data.error ? String(data.error) : t("status_claim_error_generic");
+          if (statusEl) statusEl.textContent = msg;
+          currentStatusKey = null;
           if (!data.alreadyClaimed) {
             claimBtn.disabled = false;
           }
           return;
         }
 
-        statusEl.innerHTML =
-          "Успех! 500 SKR отправлены на твой кошелёк.<br>" +
-          (data.signature
-            ? 'Tx: <a href="https://solscan.io/tx/' +
-              data.signature +
-              '" target="_blank" style="color:#14f195;text-decoration:underline;">смотреть в Solscan</a>'
-            : "");
+        const sig = data.signature;
+        const base = t("claim_success_plain");
+        const viewLabel = t("view_tx");
+        if (sig && statusEl) {
+          statusEl.innerHTML =
+            base +
+            '<br><a href="https://solscan.io/tx/' +
+            sig +
+            '" target="_blank" style="color:#14f195;text-decoration:underline;">' +
+            viewLabel +
+            "</a>";
+        } else if (statusEl) {
+          statusEl.textContent = base;
+        }
+        currentStatusKey = null;
       } catch (e) {
         console.error(e);
-        statusEl.textContent = "Сетевая ошибка. Попробуй ещё раз.";
+        setStatusKey("status_claim_network");
         claimBtn.disabled = false;
       }
     }
@@ -906,7 +1568,7 @@
     async function joinRaffle() {
       if (!walletAddress) return;
       raffleBtn.disabled = true;
-      statusEl.textContent = "Регистрирую участие в розыгрыше 3 SOL...";
+      setStatusKey("status_raffle_sending");
 
       try {
         const res = await fetch("/api/raffle", {
@@ -915,28 +1577,28 @@
           body: JSON.stringify({ wallet: walletAddress })
         });
 
-        const data = await res.json().catch(() => ({}));
+        const data = await res.json().catch(function () { return {}; });
 
         if (!res.ok) {
-          statusEl.textContent =
-            "Ошибка регистрации в розыгрыше: " +
-            (data.error || "попробуй позже");
+          const msg = data.error ? String(data.error) : t("status_raffle_error_generic");
+          if (statusEl) statusEl.textContent = msg;
+          currentStatusKey = null;
           raffleBtn.disabled = false;
           return;
         }
 
-        statusEl.textContent =
-          "Ты участвуешь в розыгрыше 3 SOL. Всего победителей: 10.";
+        if (statusEl) statusEl.textContent = t("raffle_success");
+        currentStatusKey = null;
       } catch (e) {
         console.error(e);
-        statusEl.textContent = "Сетевая ошибка при регистрации в розыгрыше.";
+        setStatusKey("status_raffle_network");
         raffleBtn.disabled = false;
       }
     }
 
-    connectBtn.addEventListener("click", connectWallet);
-    claimBtn.addEventListener("click", claimAirdrop);
-    raffleBtn.addEventListener("click", joinRaffle);
+    if (connectBtn) connectBtn.addEventListener("click", connectWallet);
+    if (claimBtn) claimBtn.addEventListener("click", claimAirdrop);
+    if (raffleBtn) raffleBtn.addEventListener("click", joinRaffle);
   </script>
 </body>
 </html>
