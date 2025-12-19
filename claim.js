@@ -1,3 +1,4 @@
+// api/claim.js
 const {
   Connection,
   clusterApiUrl,
@@ -17,7 +18,7 @@ const bs58 = require("bs58");
 const RPC_URL = process.env.RPC_URL || clusterApiUrl("mainnet-beta");
 const TOKEN_MINT = new PublicKey("Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh");
 const DECIMALS = 6;
-const AMOUNT_PER_CLAIM = BigInt(500) * 10n ** BigInt(DECIMALS);
+const AMOUNT_PER_CLAIM = 500n * 10n ** BigInt(DECIMALS); // 500 SKR
 
 // === Solana connection ===
 const connection = new Connection(RPC_URL, "confirmed");
@@ -38,7 +39,7 @@ try {
   throw e;
 }
 
-// In-memory anti-double-claim per function instance
+// In-memory anti-double-claim (на каждый инстанс функции)
 const claimedWallets = new Set();
 
 module.exports = async (req, res) => {
@@ -48,15 +49,15 @@ module.exports = async (req, res) => {
   }
 
   let body = req.body;
-  if (typeof body === "string") {
+  if (!body || typeof body === "string") {
     try {
-      body = JSON.parse(body);
+      body = JSON.parse(body || "{}");
     } catch {
       body = {};
     }
   }
 
-  const wallet = body && body.wallet;
+  const wallet = body.wallet;
   if (!wallet) {
     res.status(400).json({ error: "wallet is required" });
     return;
@@ -86,9 +87,7 @@ module.exports = async (req, res) => {
     );
 
     if (airdropAta.amount < AMOUNT_PER_CLAIM) {
-      res
-        .status(400)
-        .json({ error: "Not enough SKR on airdrop wallet" });
+      res.status(400).json({ error: "Not enough SKR on airdrop wallet" });
       return;
     }
 
@@ -104,7 +103,7 @@ module.exports = async (req, res) => {
       airdropAta.address,
       userAta.address,
       airdropKeypair.publicKey,
-      Number(AMOUNT_PER_CLAIM),
+      AMOUNT_PER_CLAIM, // bigint
       [],
       TOKEN_PROGRAM_ID
     );
