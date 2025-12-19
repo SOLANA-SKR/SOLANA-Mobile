@@ -183,85 +183,62 @@
       color:var(--muted);
     }
 
-    /* HERO S */
+    /* HERO с анимацией Solana */
     .hero{
+      position:relative;
       border-radius:var(--radius-xl);
-      padding:54px 26px 34px;
-      background:
-        radial-gradient(900px 500px at 50% 40%,rgba(255,255,255,.06) 0,rgba(255,255,255,0) 62%),
-        rgba(255,255,255,.03);
+      padding:60px 24px 26px;
+      text-align:center;
+      overflow:hidden;
       border:1px solid rgba(255,255,255,.08);
       box-shadow:var(--shadow);
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      text-align:center;
-      gap:16px;
-      overflow:hidden;
-      position:relative;
-      min-height:340px;
+      background:rgba(0,0,0,.6);
+      min-height:360px;
+    }
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:-40px;
+      background-image:url("solana-hero.jpg"); /* сохрани картинку как solana-hero.jpg */
+      background-size:120% auto;
+      background-position:50% 50%;
+      opacity:.9;
+      filter:saturate(1.1);
+      animation:heroBgMove 36s ease-in-out infinite alternate;
+      z-index:0;
     }
     .hero::after{
       content:"";
       position:absolute;
-      inset:-120px;
+      inset:-40px;
       background:
-        radial-gradient(closest-side,rgba(128,236,255,.14),rgba(128,236,255,0) 70%),
-        radial-gradient(closest-side,rgba(20,241,149,.12),rgba(20,241,149,0) 70%);
-      filter:blur(26px);
-      opacity:.7;
-      pointer-events:none;
+        radial-gradient(circle at 50% 0,rgba(0,0,0,.10) 0,rgba(0,0,0,.55) 45%,rgba(0,0,0,.90) 100%);
+      mix-blend-mode:multiply;
+      z-index:0;
+    }
+    @keyframes heroBgMove{
+      0%{background-position:46% 46%;background-size:118% auto;}
+      100%{background-position:54% 54%;background-size:130% auto;}
+    }
+    .hero-inner{
+      position:relative;
+      z-index:1;
+      max-width:700px;
+      margin:0 auto;
     }
 
     .hero-logo{
-      width:210px;
-      max-width:60%;
-      filter:drop-shadow(0 0 26px rgba(128,236,255,.25));
-      margin-bottom:8px;
-      position:relative;
-      z-index:1;
+      width:120px;
+      filter:drop-shadow(0 0 26px rgba(128,236,255,.3));
+      margin-bottom:10px;
     }
-
-    .hero-s{
-      position:relative;
-      z-index:1;
-      font-size:150px;
+    .hero-title{
+      font-size:3.1rem;
       font-weight:900;
-      line-height:1;
       letter-spacing:-.04em;
-      color:transparent;
-      background:linear-gradient(90deg,var(--sol-a),var(--sol-b),var(--sol-c),var(--sol-a));
-      background-size:240% 100%;
-      -webkit-background-clip:text;
-      background-clip:text;
-      filter:drop-shadow(0 18px 34px rgba(0,0,0,.6));
-      animation:solShift 2.6s linear infinite;
-      user-select:none;
-      margin-top:4px;
-      margin-bottom:6px;
+      margin-bottom:4px;
     }
-    .hero-s::before{
-      content:"";
-      position:absolute;
-      left:-12%;
-      right:-12%;
-      top:50%;
-      height:22%;
-      transform:translateY(-50%) skewX(-12deg);
-      background:rgba(7,11,16,.78);
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.1);
-      backdrop-filter:blur(10px);
-    }
-
-    @keyframes solShift{
-      0%{background-position:0% 50%}
-      100%{background-position:100% 50%}
-    }
-
     .hero-sub{
-      position:relative;
-      z-index:1;
       display:flex;
       flex-wrap:wrap;
       justify-content:center;
@@ -270,23 +247,18 @@
       letter-spacing:.12em;
       text-transform:uppercase;
       color:var(--muted);
+      margin-bottom:10px;
     }
-    .hero-sub span b{
-      color:#fff;
-    }
-
     .hero-badge{
-      position:relative;
-      z-index:1;
-      margin-top:6px;
+      margin:0 auto;
       display:inline-flex;
       align-items:center;
-      gap:6px;
-      padding:6px 14px;
+      gap:8px;
+      padding:6px 16px;
       border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(0,0,0,.45);
-      font-size:.82rem;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(0,0,0,.65);
+      font-size:.84rem;
       color:var(--muted);
     }
     .hero-badge b{
@@ -294,20 +266,97 @@
     }
 
     .hero-note{
-      position:relative;
-      z-index:1;
-      margin-top:4px;
+      margin-top:6px;
       font-size:.86rem;
       color:var(--muted);
     }
 
     .hero-status{
-      position:relative;
-      z-index:1;
-      margin-top:10px;
+      margin-top:14px;
       font-size:.9rem;
       color:var(--muted);
       min-height:20px;
+    }
+
+    /* Панель выбора кошельков */
+    .wallet-panel{
+      margin-top:18px;
+      padding:12px 14px 14px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(2,6,14,.85);
+      backdrop-filter:blur(14px);
+      box-shadow:0 16px 40px rgba(0,0,0,.7);
+    }
+    .wallet-panel-title{
+      font-size:.86rem;
+      letter-spacing:.15em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+    .wallet-panel-sub{
+      font-size:.82rem;
+      color:var(--muted);
+      margin-bottom:10px;
+    }
+    .wallet-grid{
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:8px;
+    }
+    .wallet-card{
+      border:none;
+      background:rgba(10,15,25,.96);
+      border-radius:999px;
+      padding:7px 11px 7px 7px;
+      display:flex;
+      align-items:center;
+      gap:7px;
+      cursor:pointer;
+      font-size:.82rem;
+      color:var(--text);
+      box-shadow:0 10px 24px rgba(0,0,0,.6);
+      transition:transform .12s, box-shadow .12s, border-color .12s, background .12s;
+      border:1px solid rgba(255,255,255,.16);
+    }
+    .wallet-card:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,.05);
+      box-shadow:0 16px 34px rgba(0,0,0,.75);
+    }
+    .wallet-card--active{
+      border-color:var(--sol-a);
+      box-shadow:0 0 24px rgba(20,241,149,.55);
+    }
+    .wallet-icon{
+      width:22px;
+      height:22px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      font-size:13px;
+      font-weight:700;
+      color:#fff;
+    }
+    .wallet-icon.phantom{
+      background:linear-gradient(135deg,#8a5cff,#c8a4ff);
+    }
+    .wallet-icon.solflare{
+      background:linear-gradient(135deg,#ff9a4a,#ff5831);
+    }
+    .wallet-icon.backpack{
+      background:linear-gradient(135deg,#34d5ff,#1b78ff);
+    }
+    .wallet-icon.glow{
+      background:linear-gradient(135deg,#24ffb5,#28a9ff);
+    }
+    .wallet-icon.trust{
+      background:linear-gradient(135deg,#2c7dff,#3ab4ff);
+    }
+    .wallet-name{
+      white-space:nowrap;
     }
 
     /* GRID PANELS */
@@ -498,20 +547,21 @@
         grid-template-columns:1fr;
       }
       .panel h2{font-size:2.1rem;}
-      .hero-s{font-size:130px;}
+      .hero-title{font-size:2.5rem;}
     }
 
     @media (max-width:640px){
       .nav{padding:0 12px;}
       .wrap{padding:90px 12px 60px;}
-      .hero{padding:40px 16px 28px;}
-      .hero-logo{width:160px;}
+      .hero{padding:46px 14px 22px;}
+      .hero-logo{width:90px;}
       .nav .addr{display:none;}
     }
 
     @media (prefers-reduced-motion:reduce){
-      .hero-s{animation:none;}
       .chart .curve{animation:none;stroke-dashoffset:0;}
+      .hero{animation:none;}
+      .hero::before{animation:none;}
     }
   </style>
 </head>
@@ -554,25 +604,55 @@
   <main class="wrap">
     <!-- HERO -->
     <section class="hero">
-      <img
-        src="https://purple-accused-scorpion-11.mypinata.cloud/ipfs/bafybeifvwriqjehl62zeceva2yp7653jxy7sghyehrqh263aeuqbecsy7i"
-        alt="Mobile SKR Logo"
-        class="hero-logo"
-      />
+      <div class="hero-inner">
+        <img
+          src="https://purple-accused-scorpion-11.mypinata.cloud/ipfs/bafybeifvwriqjehl62zeceva2yp7653jxy7sghyehrqh263aeuqbecsy7i"
+          alt="Mobile SKR Logo"
+          class="hero-logo"
+        />
 
-      <div class="hero-s" aria-hidden="true">S</div>
+        <div class="hero-title">SKR</div>
 
-      <div class="hero-sub">
-        <span data-i18n="hero_sub_1"></span>
-        <span>·</span>
-        <span data-i18n="hero_sub_2"></span>
+        <div class="hero-sub">
+          <span data-i18n="hero_sub_1"></span>
+          <span>·</span>
+          <span data-i18n="hero_sub_2"></span>
+        </div>
+
+        <div class="hero-badge" data-i18n="hero_badge"></div>
+
+        <div class="hero-note" data-i18n="airdrop_desc"></div>
+
+        <div class="wallet-panel">
+          <div class="wallet-panel-title" data-i18n="wallet_panel_title"></div>
+          <div class="wallet-panel-sub" data-i18n="wallet_panel_sub"></div>
+
+          <div class="wallet-grid">
+            <button class="wallet-card" data-wallet="phantom">
+              <span class="wallet-icon phantom">P</span>
+              <span class="wallet-name">Phantom</span>
+            </button>
+            <button class="wallet-card" data-wallet="solflare">
+              <span class="wallet-icon solflare">S</span>
+              <span class="wallet-name">Solflare</span>
+            </button>
+            <button class="wallet-card" data-wallet="backpack">
+              <span class="wallet-icon backpack">B</span>
+              <span class="wallet-name">Backpack</span>
+            </button>
+            <button class="wallet-card" data-wallet="glow">
+              <span class="wallet-icon glow">G</span>
+              <span class="wallet-name">Glow</span>
+            </button>
+            <button class="wallet-card" data-wallet="trust">
+              <span class="wallet-icon trust">T</span>
+              <span class="wallet-name">Trust</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="hero-status" id="status"></div>
       </div>
-
-      <div class="hero-badge" data-i18n="hero_badge"></div>
-
-      <div class="hero-note" data-i18n="airdrop_desc"></div>
-
-      <div class="hero-status" id="status"></div>
     </section>
 
     <!-- МИССИЯ -->
@@ -845,8 +925,10 @@
         hero_sub_2: "открытая мобильная платформа",
         hero_badge: "🎁 Airdrop перед пулом · 500 SKR за кошелёк",
         airdrop_desc: "На airdrop выделено 3 000 000 монет SKR. Каждый, кто успеет нажать кнопку «Забрать монеты», получит 500 SKR (один раз на кошелёк).",
+        wallet_panel_title: "Выбери кошелёк",
+        wallet_panel_sub: "Поддерживаются Phantom, Solflare, Backpack, Glow, Trust и другие Solana-кошельки.",
         mission_title: "Наша миссия",
-        mission_p1: "Сегодня мобильная дуополия решает, какие приложения будут доступны, кто получит выплаты и какие правила действуют. Mobile SKR строит открытую мобильную платформу, где управление и ценность делятся между сообществом.",
+        mission_p1: "Сегодня мобильная дуополия решает, какие приложения будут доступны, кто получит выплаты и какие правила действуют. Mobile SKR строит открытую мобильную платформу, где управление и ценность делятся с сообществом.",
         mission_p2: "SKR — собственный актив экосистемы. Он распределяет контроль, поддерживает модерацию и выравнивает стимулы между разработчиками, пользователями и партнёрами по оборудованию.",
         mission_p3: "С токеном SKR сообщество управляет развитием, а пользователи и разработчики получают долю создаваемой ими стоимости.",
         card1_title: "Децентрализованное управление",
@@ -865,7 +947,7 @@
         metric3_desc: "Долгосрочная инфляция 2% — поддерживает безопасность и развитие.",
         inflation_chart_label: "Seeker · SKR Inflation Rate",
         dist_chart_label: "Seeker · SKR Distribution",
-        dist_note: "Диаграмма иллюстрирует доли: airdrop, рост и партнёрства, команда, ликвидность, казначейство. Проценты смотри в таблице справа.",
+        dist_note: "Диаграмма иллюстрирует доли: airdrop, рост и партнёрства, команда, ликвидность, казначейство. Проценты смотри в таблице.",
         tokenomics_title: "Токеномика",
         table_head_cat: "Категория",
         table_head_alloc: "Распределение",
@@ -888,7 +970,7 @@
         row6_cat: "Казначейство сообщества",
         row6_alloc: "10%",
         row6_unlock: "Управляется через голосование",
-        supply_html: "Общий объём: <b>10&nbsp;000&nbsp;000&nbsp;000 SKR</b><br>Токен: <b>Mobile SKR</b> · Mint: <code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>"
+        supply_html: "Общий объём: <b>10&nbsp;000&nbsp;000&nbsp;000 SKR</b><br>Token: <b>Mobile SKR</b> · Mint: <code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>"
       },
       en: {
         wallet_label_disconnected: "Wallet: not connected",
@@ -917,6 +999,8 @@
         hero_sub_2: "open mobile platform",
         hero_badge: "🎁 Airdrop before launch · 500 SKR per wallet",
         airdrop_desc: "3,000,000 SKR is allocated to the airdrop. Everyone who clicks the Claim tokens button in time receives 500 SKR (one claim per wallet).",
+        wallet_panel_title: "Choose your wallet",
+        wallet_panel_sub: "Works with Phantom, Solflare, Backpack, Glow, Trust and other Solana wallets.",
         mission_title: "Our Mission",
         mission_p1: "Today's mobile duopoly decides which apps ship, who gets paid, and which rules apply. Mobile SKR is building an open mobile platform where control and value are shared with the community.",
         mission_p2: "SKR is the native asset of the ecosystem. It distributes control, powers moderation, and aligns incentives between developers, users, and hardware partners.",
@@ -989,6 +1073,8 @@
         hero_sub_2: "offene mobile Plattform",
         hero_badge: "🎁 Airdrop vor dem Launch · 500 SKR pro Wallet",
         airdrop_desc: "Für den Airdrop sind 3.000.000 SKR reserviert. Jeder, der rechtzeitig auf die Schaltfläche Token abholen klickt, erhält 500 SKR (einmal pro Wallet).",
+        wallet_panel_title: "Wähle dein Wallet",
+        wallet_panel_sub: "Unterstützt werden Phantom, Solflare, Backpack, Glow, Trust und andere Solana-Wallets.",
         mission_title: "Unsere Mission",
         mission_p1: "Die heutige mobile Duopol-Struktur entscheidet, welche Apps erscheinen, wer bezahlt wird und welche Regeln gelten. Mobile SKR baut eine offene mobile Plattform, in der Kontrolle und Wert mit der Community geteilt werden.",
         mission_p2: "SKR ist der native Vermögenswert des Ökosystems. Er verteilt Kontrolle, ermöglicht Moderation und richtet die Anreize von Entwicklern, Nutzern und Hardware-Partnern aus.",
@@ -1061,6 +1147,8 @@
         hero_sub_2: "开放的移动平台",
         hero_badge: "🎁 上线前空投 · 每个钱包 500 SKR",
         airdrop_desc: "本次空投共分配 3,000,000 枚 SKR。只要在活动期间点击“领取代币”按钮，每个钱包即可领取 500 SKR（限领一次）。",
+        wallet_panel_title: "选择你的钱包",
+        wallet_panel_sub: "支持 Phantom、Solflare、Backpack、Glow、Trust 等 Solana 钱包。",
         mission_title: "我们的使命",
         mission_p1: "今天的移动双头垄断决定了哪些应用可以上架、谁能获得收益以及适用哪些规则。Mobile SKR 正在打造一个开放的移动平台，把控制权和价值交给社区。",
         mission_p2: "SKR 是生态系统的原生资产，用于分配控制权、支持内容审核，并让开发者、用户和硬件伙伴的激励保持一致。",
@@ -1133,6 +1221,8 @@
         hero_sub_2: "オープンなモバイルプラットフォーム",
         hero_badge: "🎁 ローンチ前エアドロップ · 1 ウォレットあたり 500 SKR",
         airdrop_desc: "このエアドロップには合計 3,000,000 SKR が割り当てられています。期間中にトークンを受け取るボタンを押したウォレットごとに 500 SKR を 1 回まで受け取ることができます。",
+        wallet_panel_title: "ウォレットを選択",
+        wallet_panel_sub: "Phantom、Solflare、Backpack、Glow、Trust などの Solana ウォレットに対応。",
         mission_title: "私たちのミッション",
         mission_p1: "現在のモバイル市場の二極化により、どのアプリが公開され、誰が報酬を受け取り、どんなルールが適用されるかが決められています。Mobile SKR は、コミュニティとコントロールや価値を共有するオープンなモバイルプラットフォームを構築します。",
         mission_p2: "SKR はエコシステムのネイティブトークンであり、ガバナンスやモデレーションを支え、開発者・ユーザー・ハードウェアパートナーのインセンティブを揃えます。",
@@ -1205,6 +1295,8 @@
         hero_sub_2: "відкрита мобільна платформа",
         hero_badge: "🎁 Airdrop перед пулом · 500 SKR за гаманець",
         airdrop_desc: "На airdrop виділено 3 000 000 монет SKR. Кожен, хто встигне натиснути кнопку «Забрати токени», отримує 500 SKR (один раз на гаманець).",
+        wallet_panel_title: "Вибери гаманець",
+        wallet_panel_sub: "Підтримуються Phantom, Solflare, Backpack, Glow, Trust та інші Solana-гаманці.",
         mission_title: "Наша місія",
         mission_p1: "Сьогодні мобільна дуополія вирішує, які застосунки будуть доступні, хто отримає виплати та які правила діють. Mobile SKR будує відкриту мобільну платформу, де контроль і цінність розділено з комʼюніті.",
         mission_p2: "SKR — власний актив екосистеми. Він розподіляє контроль, підтримує модерацію та вирівнює стимули між розробниками, користувачами й партнерами по обладнанню.",
@@ -1248,7 +1340,7 @@
         row6_cat: "Казначейство спільноти",
         row6_alloc: "10%",
         row6_unlock: "Керується токен-холдерами",
-        supply_html: "Загальна пропозиція: <b>10&nbsp;000&nbsp;000&nbsp;000 SKR</b><br>Токен: <b>Mobile SKR</b> · Mint: <code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>"
+        supply_html: "Загальна пропозиція: <b>10&nbsp;000&nbsp;000&nbsp;000 SKR</b><br>Token: <b>Mobile SKR</b> · Mint: <code>Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh</code>"
       },
       pl: {
         wallet_label_disconnected: "Portfel: niepołączony",
@@ -1277,6 +1369,8 @@
         hero_sub_2: "otwarta platforma mobilna",
         hero_badge: "🎁 Airdrop przed pulą · 500 SKR na portfel",
         airdrop_desc: "Na airdrop przeznaczono 3 000 000 tokenów SKR. Każdy, kto zdąży kliknąć przycisk Odbierz tokeny, otrzyma 500 SKR (raz na portfel).",
+        wallet_panel_title: "Wybierz portfel",
+        wallet_panel_sub: "Obsługiwane: Phantom, Solflare, Backpack, Glow, Trust i inne portfele Solana.",
         mission_title: "Nasza misja",
         mission_p1: "Dzisiejszy duopol mobilny decyduje, które aplikacje się pojawią, kto dostanie wypłaty i jakie zasady obowiązują. Mobile SKR buduje otwartą platformę mobilną, w której kontrola i wartość są współdzielone z społecznością.",
         mission_p2: "SKR to natywny token ekosystemu. Rozdziela kontrolę, wspiera moderację i wyrównuje bodźce pomiędzy deweloperami, użytkownikami i partnerami sprzętowymi.",
@@ -1349,6 +1443,8 @@
         hero_sub_2: "منصّة جوال مفتوحة",
         hero_badge: "🎁 إنزال جوي قبل الإطلاق · 500 SKR لكل محفظة",
         airdrop_desc: "تم تخصيص 3,000,000 من عملة SKR لهذا الإنزال الجوي. كل من يضغط زر استلام الرموز في الوقت المحدد يحصل على 500 SKR (مرة واحدة لكل محفظة).",
+        wallet_panel_title: "اختر المحفظة",
+        wallet_panel_sub: "يدعم Phantom و Solflare و Backpack و Glow و Trust وغيرها من محافظ Solana.",
         mission_title: "مهمتنا",
         mission_p1: "اليوم يقرّر احتكار الهواتف المحمولة أي التطبيقات تُطلق، ومن يحصل على الدخل، وأي القواعد تنطبق. يهدف Mobile SKR إلى بناء منصّة جوال مفتوحة يتقاسم فيها المجتمع السيطرة والقيمة.",
         mission_p2: "يُعد SKR الأصل الأصلي للنظام البيئي؛ فهو يوزّع التحكم، ويدعم الإشراف، ويوحّد الحوافز بين المطوّرين والمستخدمين وشركاء العتاد.",
@@ -1466,48 +1562,64 @@
       });
     }
 
-    // Первичная инициализация текстов
     applyStaticTranslations();
 
-    // ===== WALLET & BACKEND =====
-    async function connectWallet() {
+    // ===== WALLETS =====
+    const walletCards = document.querySelectorAll(".wallet-card");
+
+    function detectWallets() {
+      const list = [];
+      if (window.phantom && window.phantom.solana && window.phantom.solana.isPhantom) {
+        list.push({ id: "phantom", provider: window.phantom.solana });
+      }
+      if (window.solflare && window.solflare.isSolflare) {
+        list.push({ id: "solflare", provider: window.solflare });
+      }
+      if (window.backpack && window.backpack.solana) {
+        list.push({ id: "backpack", provider: window.backpack.solana });
+      }
+      if (window.glowSolana) {
+        list.push({ id: "glow", provider: window.glowSolana });
+      }
+      if (window.trustWallet && window.trustWallet.solana) {
+        list.push({ id: "trust", provider: window.trustWallet.solana });
+      }
+      if (window.solana) {
+        const already = list.some((w) => w.provider === window.solana);
+        if (!already) list.push({ id: "generic", provider: window.solana });
+      }
+      return list;
+    }
+
+    function highlightWallet(id) {
+      walletCards.forEach(function (card) {
+        if (card.dataset.wallet === id) card.classList.add("wallet-card--active");
+        else card.classList.remove("wallet-card--active");
+      });
+    }
+
+    async function connectWallet(preferredId) {
+      const wallets = detectWallets();
+      if (!wallets.length) {
+        alert(t("alert_no_wallet") || "No Solana wallet found.");
+        return;
+      }
+
+      let chosen = wallets[0];
+      if (preferredId && preferredId !== "auto") {
+        const specific = wallets.find((w) => w.id === preferredId);
+        if (specific) chosen = specific;
+      }
+
       try {
-        const candidates = [];
-
-        if (window.phantom && window.phantom.solana && window.phantom.solana.isPhantom) {
-          candidates.push({ name: "Phantom", provider: window.phantom.solana });
-        }
-        if (window.solflare && window.solflare.isSolflare) {
-          candidates.push({ name: "Solflare", provider: window.solflare });
-        }
-        if (window.backpack && window.backpack.solana) {
-          candidates.push({ name: "Backpack", provider: window.backpack.solana });
-        }
-        if (window.glowSolana) {
-          candidates.push({ name: "Glow", provider: window.glowSolana });
-        }
-        if (window.trustWallet && window.trustWallet.solana) {
-          candidates.push({ name: "Trust", provider: window.trustWallet.solana });
-        }
-        if (!candidates.length && window.solana) {
-          candidates.push({ name: "Solana", provider: window.solana });
-        }
-
-        if (!candidates.length) {
-          alert(t("alert_no_wallet") || "No Solana wallet found.");
-          return;
-        }
-
-        const chosen = candidates[0];
-        const provider = chosen.provider;
-
-        const resp = await provider.connect();
-        const pubkey = resp && resp.publicKey ? resp.publicKey : provider.publicKey;
+        const resp = await chosen.provider.connect();
+        const pubkey = (resp && resp.publicKey) || chosen.provider.publicKey;
         if (!pubkey) throw new Error("No publicKey");
 
-        walletProvider = provider;
+        walletProvider = chosen.provider;
         walletAddress = pubkey.toString();
 
+        highlightWallet(chosen.id);
         updateWalletLabel();
         updateButtonsText();
         claimBtn.disabled = false;
@@ -1596,7 +1708,13 @@
       }
     }
 
-    if (connectBtn) connectBtn.addEventListener("click", connectWallet);
+    if (connectBtn) connectBtn.addEventListener("click", function () { connectWallet("auto"); });
+    walletCards.forEach(function (card) {
+      card.addEventListener("click", function () {
+        const id = card.dataset.wallet || "auto";
+        connectWallet(id);
+      });
+    });
     if (claimBtn) claimBtn.addEventListener("click", claimAirdrop);
     if (raffleBtn) raffleBtn.addEventListener("click", joinRaffle);
   </script>
