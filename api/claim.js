@@ -16,14 +16,16 @@ const {
 const bs58 = require("bs58");
 
 // === CONFIG ===
+// если есть RPC_URL в env – берём его, иначе стандартный mainnet-beta
 const RPC_URL = process.env.RPC_URL || clusterApiUrl("mainnet-beta");
-// ТВОЙ mint SKR
+
+// ВАЖНО: это MINT твоего токена SKR в mainnet
 const TOKEN_MINT = new PublicKey("Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh");
 
-// подключение к Solana mainnet-beta (или что ты указал в RPC_URL)
+// подключение к Solana
 const connection = new Connection(RPC_URL, "confirmed");
 
-// читаем приватный ключ кошелька раздачи
+// читаем приватный ключ кошелька раздачи из env
 if (!process.env.AIRDROP_PRIVATE_KEY_BASE58) {
   console.error("❌ No AIRDROP_PRIVATE_KEY_BASE58 in environment");
   throw new Error("AIRDROP_PRIVATE_KEY_BASE58 is not set");
@@ -39,74 +41,34 @@ try {
   throw new Error("Failed to init airdrop keypair: " + (e.message || "unknown"));
 }
 
-// кешируем информацию о mint (decimals)
-let mintInfoPromise = null;
-async function getMintInfo() {
-  if (!mintInfoPromise) {
-    mintInfoPromise = getMint(connection, TOKEN_MINT).then((mint) => {
+// один раз получаем decimals у mint
+let decimalsPromise = null;
+async function getDecimals() {
+  if (!decimalsPromise) {
+    decimalsPromise = getMint(connection, TOKEN_MINT).then((mint) => {
       console.log("ℹ️ SKR decimals:", mint.decimals);
-      return mint;
+      return mint.decimals;
     });
   }
-  return mintInfoPromise;
+  return decimalsPromise;
 }
 
-// ищем токен-аккаунт с максимумом SKR у кошелька раздачи
-async function getRichestSourceTokenAccount() {
-  const owner = airdropKeypair.publicKey;
-
-  const resp = await connection.getParsedTokenAccountsByOwner(
-    owner,
-    { mint: TOKEN_MINT },
-    "confirmed"
-  );
-
-  if (!resp.value || resp.value.length === 0) {
-    throw new Error("No token accounts for this mint on airdrop wallet");
-  }
-
-  let best = null;
-
-  for (const item of resp.value) {
-    const pubkey = item.pubkey;
-    const info = item.account.data.parsed.info;
-    const amountStr = info.tokenAmount.amount; // строка
-    const amount = BigInt(amountStr);
-
-    if (!best || amount > best.amount) {
-      best = { pubkey, amount };
-    }
-  }
-
-  console.log(
-    "🏦 Source token account:",
-    best.pubkey.toBase58(),
-    "balance (raw):",
-    best.amount.toString()
-  );
-
-  return best;
-}
-
-// защита от повторного claim на один инстанс функции
-const claimedWallets = new Set();
+// можно вообще убрать антидубль, чтобы не мешал тестам
+// если хочешь оставить – раскомментируй
+// const claimedWallets = new Set();
 
 module.exports = async (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
   }
 
-  let body = req.body;
-  if (!body || typeof body === "string") {
-    try {
-      body = JSON.parse(body || "{}");
-    } catch {
-      body = {};
-    }
-  }
-
+  // ВАЖНО: Vercel сам парсит JSON-Body, если заголовок Content-Type: application/json
+  const body = req.body || {};
   const wallet = body.wallet;
+
   if (!wallet) {
     res.status(400).json({ error: "wallet is required" });
     return;
@@ -120,32 +82,29 @@ module.exports = async (req, res) => {
     return;
   }
 
+  // если хочешь ограничить до одного клейма на инстанс – раскомментируй
+  /*
   const userKeyStr = userPubkey.toBase58();
   if (claimedWallets.has(userKeyStr)) {
     res.status(400).json({ error: "already claimed", alreadyClaimed: true });
     return;
   }
+  */
 
   try {
-    // 1) mint info → decimals → 500 SKR
-    const mintInfo = await getMintInfo();
-    const decimals = mintInfo.decimals;
-    const amountPerClaim = 500n * 10n ** BigInt(decimals); // 500 SKR
+    // 1) берём decimals и считаем 500 SKR как обычное число
+    const decimals = await getDecimals();
+    const amountPerClaim = 500 * 10 ** decimals; // 500 SKR
 
-    // 2) ищем токен-аккаунт с максимальным балансом SKR
-    const source = await getRichestSourceTokenAccount();
+    // 2) токен-аккаунт кошелька раздачи (создаст, если не было)
+    const airdropAta = await getOrCreateAssociatedTokenAccount(
+      connection,
+      airdropKeypair,
+      TOKEN_MINT,
+      airdropKeypair.publicKey
+    );
 
-    if (source.amount < amountPerClaim) {
-      return res.status(400).json({
-        error: "Not enough SKR on airdrop wallet",
-        airdropWallet: airdropKeypair.publicKey.toBase58(),
-        haveRaw: source.amount.toString(),
-        needRaw: amountPerClaim.toString(),
-        decimals,
-      });
-    }
-
-    // 3) ATA пользователя (создаём, если нет)
+    // 3) токен-аккаунт пользователя
     const userAta = await getOrCreateAssociatedTokenAccount(
       connection,
       airdropKeypair,
@@ -153,30 +112,37 @@ module.exports = async (req, res) => {
       userPubkey
     );
 
+    console.log("From ATA:", airdropAta.address.toBase58());
+    console.log("To ATA:", userAta.address.toBase58());
+    console.log("Amount per claim (raw):", amountPerClaim);
+
     // 4) перевод 500 SKR
     const ix = createTransferInstruction(
-      source.pubkey,                 // откуда
-      userAta.address,               // куда
-      airdropKeypair.publicKey,      // владелец
-      amountPerClaim,                // сколько
+      airdropAta.address,           // откуда
+      userAta.address,              // куда
+      airdropKeypair.publicKey,     // владелец
+      amountPerClaim,               // сколько (number)
       [],
       TOKEN_PROGRAM_ID
     );
 
     const tx = new Transaction().add(ix);
     tx.feePayer = airdropKeypair.publicKey;
-    const { blockhash } = await connection.getLatestBlockhash();
+    const { blockhash } = await connection.getLatestBlockhash("finalized");
     tx.recentBlockhash = blockhash;
 
     const sig = await sendAndConfirmTransaction(connection, tx, [
       airdropKeypair,
     ]);
 
-    claimedWallets.add(userKeyStr);
+    // claimedWallets.add(userKeyStr);
 
     res.status(200).json({ ok: true, signature: sig });
   } catch (e) {
     console.error("❌ claim error", e);
-    res.status(500).json({ error: e.message || "internal error" });
+    // ВОТ ЭТО сообщение и улетает на фронт как data.error
+    res.status(500).json({
+      error: e.message || "failed to claim airdrop",
+    });
   }
 };
