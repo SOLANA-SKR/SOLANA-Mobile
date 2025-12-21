@@ -19,7 +19,7 @@ const bs58 = require("bs58");
 // если есть RPC_URL в env – берём его, иначе стандартный mainnet-beta
 const RPC_URL = process.env.RPC_URL || clusterApiUrl("mainnet-beta");
 
-// ВАЖНО: это MINT твоего токена SKR в mainnet
+// МИНТ твоего токена SKR (mainnet)
 const TOKEN_MINT = new PublicKey("Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh");
 
 // подключение к Solana
@@ -53,8 +53,7 @@ async function getDecimals() {
   return decimalsPromise;
 }
 
-// можно вообще убрать антидубль, чтобы не мешал тестам
-// если хочешь оставить – раскомментируй
+// если хочешь блокировать повторные клеймы — включишь это позже
 // const claimedWallets = new Set();
 
 module.exports = async (req, res) => {
@@ -65,7 +64,6 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // ВАЖНО: Vercel сам парсит JSON-Body, если заголовок Content-Type: application/json
   const body = req.body || {};
   const wallet = body.wallet;
 
@@ -82,21 +80,19 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // если хочешь ограничить до одного клейма на инстанс – раскомментируй
-  /*
-  const userKeyStr = userPubkey.toBase58();
-  if (claimedWallets.has(userKeyStr)) {
-    res.status(400).json({ error: "already claimed", alreadyClaimed: true });
-    return;
-  }
-  */
+  // если нужно «один раз на кошелёк», включишь
+  // const userKeyStr = userPubkey.toBase58();
+  // if (claimedWallets.has(userKeyStr)) {
+  //   res.status(400).json({ error: "already claimed", alreadyClaimed: true });
+  //   return;
+  // }
 
   try {
-    // 1) берём decimals и считаем 500 SKR как обычное число
+    // 1) считаем 500 SKR в raw через decimals
     const decimals = await getDecimals();
-    const amountPerClaim = 500 * 10 ** decimals; // 500 SKR
+    const amountPerClaim = 500 * 10 ** decimals; // number, не BigInt
 
-    // 2) токен-аккаунт кошелька раздачи (создаст, если не было)
+    // 2) токен-аккаунт кошелька раздачи
     const airdropAta = await getOrCreateAssociatedTokenAccount(
       connection,
       airdropKeypair,
@@ -116,12 +112,12 @@ module.exports = async (req, res) => {
     console.log("To ATA:", userAta.address.toBase58());
     console.log("Amount per claim (raw):", amountPerClaim);
 
-    // 4) перевод 500 SKR
+    // 4) перевод
     const ix = createTransferInstruction(
-      airdropAta.address,           // откуда
-      userAta.address,              // куда
-      airdropKeypair.publicKey,     // владелец
-      amountPerClaim,               // сколько (number)
+      airdropAta.address,
+      userAta.address,
+      airdropKeypair.publicKey,
+      amountPerClaim,
       [],
       TOKEN_PROGRAM_ID
     );
@@ -140,7 +136,6 @@ module.exports = async (req, res) => {
     res.status(200).json({ ok: true, signature: sig });
   } catch (e) {
     console.error("❌ claim error", e);
-    // ВОТ ЭТО сообщение и улетает на фронт как data.error
     res.status(500).json({
       error: e.message || "failed to claim airdrop",
     });
