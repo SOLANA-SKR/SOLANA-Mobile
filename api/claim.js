@@ -17,48 +17,78 @@ const bs58 = require("bs58");
 
 // === CONFIG ===
 const RPC_URL = process.env.RPC_URL || clusterApiUrl("mainnet-beta");
-// МИНТ ТВОЕГО SKR
+// ТВОЙ mint SKR
 const TOKEN_MINT = new PublicKey("Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh");
 
-// подключение к Solana
+// подключение к Solana mainnet-beta (или что ты указал в RPC_URL)
 const connection = new Connection(RPC_URL, "confirmed");
 
-// читаем приватный ключ из ENV
+// читаем приватный ключ кошелька раздачи
 if (!process.env.AIRDROP_PRIVATE_KEY_BASE58) {
   console.error("❌ No AIRDROP_PRIVATE_KEY_BASE58 in environment");
   throw new Error("AIRDROP_PRIVATE_KEY_BASE58 is not set");
 }
 
 let airdropKeypair;
-let AIRDROP_PUBKEY_STR = "";
 try {
   const secretKey = bs58.decode(process.env.AIRDROP_PRIVATE_KEY_BASE58.trim());
   airdropKeypair = Keypair.fromSecretKey(secretKey);
-  AIRDROP_PUBKEY_STR = airdropKeypair.publicKey.toBase58();
-  console.log("🟢 Airdrop wallet:", AIRDROP_PUBKEY_STR);
+  console.log("🟢 Airdrop wallet:", airdropKeypair.publicKey.toBase58());
 } catch (e) {
   console.error("❌ Failed to init airdrop keypair:", e);
   throw new Error("Failed to init airdrop keypair: " + (e.message || "unknown"));
 }
 
-// кешируем decimals, чтобы не дёргать сеть каждый раз
+// кешируем информацию о mint (decimals)
 let mintInfoPromise = null;
 async function getMintInfo() {
   if (!mintInfoPromise) {
-    mintInfoPromise = getMint(connection, TOKEN_MINT)
-      .then((mint) => {
-        console.log("ℹ️ SKR decimals:", mint.decimals);
-        return mint;
-      })
-      .catch((e) => {
-        console.error("❌ Failed to fetch mint info:", e);
-        throw new Error("Failed to fetch mint info: " + (e.message || "unknown"));
-      });
+    mintInfoPromise = getMint(connection, TOKEN_MINT).then((mint) => {
+      console.log("ℹ️ SKR decimals:", mint.decimals);
+      return mint;
+    });
   }
   return mintInfoPromise;
 }
 
-// защита от повторного claim на один инстанс
+// ищем токен-аккаунт с максимумом SKR у кошелька раздачи
+async function getRichestSourceTokenAccount() {
+  const owner = airdropKeypair.publicKey;
+
+  const resp = await connection.getParsedTokenAccountsByOwner(
+    owner,
+    { mint: TOKEN_MINT },
+    "confirmed"
+  );
+
+  if (!resp.value || resp.value.length === 0) {
+    throw new Error("No token accounts for this mint on airdrop wallet");
+  }
+
+  let best = null;
+
+  for (const item of resp.value) {
+    const pubkey = item.pubkey;
+    const info = item.account.data.parsed.info;
+    const amountStr = info.tokenAmount.amount; // строка
+    const amount = BigInt(amountStr);
+
+    if (!best || amount > best.amount) {
+      best = { pubkey, amount };
+    }
+  }
+
+  console.log(
+    "🏦 Source token account:",
+    best.pubkey.toBase58(),
+    "balance (raw):",
+    best.amount.toString()
+  );
+
+  return best;
+}
+
+// защита от повторного claim на один инстанс функции
 const claimedWallets = new Set();
 
 module.exports = async (req, res) => {
@@ -97,37 +127,25 @@ module.exports = async (req, res) => {
   }
 
   try {
+    // 1) mint info → decimals → 500 SKR
     const mintInfo = await getMintInfo();
     const decimals = mintInfo.decimals;
     const amountPerClaim = 500n * 10n ** BigInt(decimals); // 500 SKR
 
-    // 1) ATA кошелька раздачи
-    const airdropAta = await getOrCreateAssociatedTokenAccount(
-      connection,
-      airdropKeypair,
-      TOKEN_MINT,
-      airdropKeypair.publicKey
-    );
+    // 2) ищем токен-аккаунт с максимальным балансом SKR
+    const source = await getRichestSourceTokenAccount();
 
-    // DEBUG в логах Vercel
-    console.log("Airdrop ATA:", airdropAta.address.toBase58());
-    console.log("Airdrop balance (raw):", airdropAta.amount.toString());
-    console.log("Need for claim (raw):", amountPerClaim.toString());
-    console.log("Decimals:", decimals);
-
-    if (airdropAta.amount < amountPerClaim) {
-      // ВАЖНО: здесь мы тебе отдаём максимум инфы, чтобы ты видел, что реально на кошельке
-      res.status(400).json({
+    if (source.amount < amountPerClaim) {
+      return res.status(400).json({
         error: "Not enough SKR on airdrop wallet",
-        airdropWallet: AIRDROP_PUBKEY_STR,
-        decimals,
-        haveRaw: airdropAta.amount.toString(),
+        airdropWallet: airdropKeypair.publicKey.toBase58(),
+        haveRaw: source.amount.toString(),
         needRaw: amountPerClaim.toString(),
+        decimals,
       });
-      return;
     }
 
-    // 2) ATA пользователя
+    // 3) ATA пользователя (создаём, если нет)
     const userAta = await getOrCreateAssociatedTokenAccount(
       connection,
       airdropKeypair,
@@ -135,12 +153,12 @@ module.exports = async (req, res) => {
       userPubkey
     );
 
-    // 3) перевод
+    // 4) перевод 500 SKR
     const ix = createTransferInstruction(
-      airdropAta.address,
-      userAta.address,
-      airdropKeypair.publicKey,
-      amountPerClaim,
+      source.pubkey,                 // откуда
+      userAta.address,               // куда
+      airdropKeypair.publicKey,      // владелец
+      amountPerClaim,                // сколько
       [],
       TOKEN_PROGRAM_ID
     );
