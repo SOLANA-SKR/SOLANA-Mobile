@@ -9,18 +9,26 @@ app.get("/", (req, res) => {
 });
 
 // ЧТОБЫ /claim ОТКРЫВАЛСЯ В БРАУЗЕРЕ
-app.get("/claim", (req, res) => {
-  res.send("CLAIM ENDPOINT OK. USE POST.");
-});
+const sendSKR = require("./solana");
 
-// ЭТО ДЛЯ КНОПКИ НА САЙТЕ
-app.post("/claim", (req, res) => {
-  console.log("CLAIM BODY:", req.body);
-  res.json({ ok: true });
-});
+app.post("/claim", async (req, res) => {
+  try {
+    const { wallet } = req.body;
+    if (!wallet) {
+      return res.status(400).json({ error: "wallet required" });
+    }
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log("SERVER STARTED ON PORT", PORT);
+    const signature = await sendSKR(wallet);
+
+    res.json({
+      ok: true,
+      signature,
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      error: e.message || "claim failed",
+    });
+  }
 });
 
