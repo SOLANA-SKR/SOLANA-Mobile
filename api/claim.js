@@ -16,9 +16,7 @@ const {
 const bs58 = require("bs58");
 
 // === CONFIG ===
-// если есть RPC_URL в env – берём его, иначе стандартный mainnet-beta
 const RPC_URL = process.env.RPC_URL || clusterApiUrl("mainnet-beta");
-
 // МИНТ твоего токена SKR (mainnet)
 const TOKEN_MINT = new PublicKey("Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh");
 
@@ -32,29 +30,76 @@ if (!process.env.AIRDROP_PRIVATE_KEY_BASE58) {
 }
 
 let airdropKeypair;
+let AIRDROP_PUBKEY_STR = "";
+
 try {
   const secretKey = bs58.decode(process.env.AIRDROP_PRIVATE_KEY_BASE58.trim());
   airdropKeypair = Keypair.fromSecretKey(secretKey);
-  console.log("🟢 Airdrop wallet:", airdropKeypair.publicKey.toBase58());
+  AIRDROP_PUBKEY_STR = airdropKeypair.publicKey.toBase58();
+  console.log("🟢 Airdrop wallet:", AIRDROP_PUBKEY_STR);
 } catch (e) {
   console.error("❌ Failed to init airdrop keypair:", e);
   throw new Error("Failed to init airdrop keypair: " + (e.message || "unknown"));
 }
 
-// один раз получаем decimals у mint
-let decimalsPromise = null;
-async function getDecimals() {
-  if (!decimalsPromise) {
-    decimalsPromise = getMint(connection, TOKEN_MINT).then((mint) => {
-      console.log("ℹ️ SKR decimals:", mint.decimals);
-      return mint.decimals;
-    });
+// --- mint info (decimals) ---
+let mintInfoPromise = null;
+async function getMintInfo() {
+  if (!mintInfoPromise) {
+    mintInfoPromise = getMint(connection, TOKEN_MINT);
   }
-  return decimalsPromise;
+  return mintInfoPromise;
 }
 
-// если хочешь блокировать повторные клеймы — включишь это позже
-// const claimedWallets = new Set();
+// --- ищем токен-аккаунт с максимальным балансом SKR ---
+async function getSourceTokenAccount() {
+  const owner = airdropKeypair.publicKey;
+
+  const resp = await connection.getParsedTokenAccountsByOwner(
+    owner,
+    { mint: TOKEN_MINT },
+    "confirmed"
+  );
+
+  // если вдруг нет parsed-аккаунтов, пробуем через стандартный ATA
+  if (!resp.value || resp.value.length === 0) {
+    const ata = await getOrCreateAssociatedTokenAccount(
+      connection,
+      airdropKeypair,
+      TOKEN_MINT,
+      owner
+    );
+    return {
+      pubkey: ata.address,
+      amount: BigInt(ata.amount.toString()),
+    };
+  }
+
+  let bestPubkey = resp.value[0].pubkey;
+  let bestAmount = BigInt(
+    resp.value[0].account.data.parsed.info.tokenAmount.amount
+  );
+
+  for (const item of resp.value.slice(1)) {
+    const amount = BigInt(item.account.data.parsed.info.tokenAmount.amount);
+    if (amount > bestAmount) {
+      bestAmount = amount;
+      bestPubkey = item.pubkey;
+    }
+  }
+
+  console.log(
+    "🏦 source token account:",
+    bestPubkey.toBase58(),
+    "balance (raw):",
+    bestAmount.toString()
+  );
+
+  return { pubkey: bestPubkey, amount: bestAmount };
+}
+
+// защита от повторного клейма на один инстанс
+const claimedWallets = new Set();
 
 module.exports = async (req, res) => {
   res.setHeader("Content-Type", "application/json");
@@ -64,9 +109,20 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const body = req.body || {};
-  const wallet = body.wallet;
+  // аккуратно парсим body (на Vercel может быть строка)
+  let body = req.body;
+  if (typeof body === "string") {
+    try {
+      body = JSON.parse(body);
+    } catch {
+      body = {};
+    }
+  }
+  if (!body || typeof body !== "object") {
+    body = {};
+  }
 
+  const wallet = body.wallet;
   if (!wallet) {
     res.status(400).json({ error: "wallet is required" });
     return;
@@ -80,27 +136,21 @@ module.exports = async (req, res) => {
     return;
   }
 
-  // если нужно «один раз на кошелёк», включишь
-  // const userKeyStr = userPubkey.toBase58();
-  // if (claimedWallets.has(userKeyStr)) {
-  //   res.status(400).json({ error: "already claimed", alreadyClaimed: true });
-  //   return;
-  // }
+  const userKeyStr = userPubkey.toBase58();
+  if (claimedWallets.has(userKeyStr)) {
+    res.status(400).json({ error: "already claimed", alreadyClaimed: true });
+    return;
+  }
 
   try {
-    // 1) считаем 500 SKR в raw через decimals
-    const decimals = await getDecimals();
-    const amountPerClaim = 500 * 10 ** decimals; // number, не BigInt
+    const mintInfo = await getMintInfo();
+    const decimals = mintInfo.decimals;
+    const amountPerClaim = 500n * 10n ** BigInt(decimals); // 500 SKR
 
-    // 2) токен-аккаунт кошелька раздачи
-    const airdropAta = await getOrCreateAssociatedTokenAccount(
-      connection,
-      airdropKeypair,
-      TOKEN_MINT,
-      airdropKeypair.publicKey
-    );
+    // 1) токен-аккаунт с реальными SKR
+    const source = await getSourceTokenAccount();
 
-    // 3) токен-аккаунт пользователя
+    // 2) ATA пользователя
     const userAta = await getOrCreateAssociatedTokenAccount(
       connection,
       airdropKeypair,
@@ -108,13 +158,12 @@ module.exports = async (req, res) => {
       userPubkey
     );
 
-    console.log("From ATA:", airdropAta.address.toBase58());
     console.log("To ATA:", userAta.address.toBase58());
-    console.log("Amount per claim (raw):", amountPerClaim);
+    console.log("Amount per claim (raw):", amountPerClaim.toString());
 
-    // 4) перевод
+    // 3) перевод 500 SKR
     const ix = createTransferInstruction(
-      airdropAta.address,
+      source.pubkey,
       userAta.address,
       airdropKeypair.publicKey,
       amountPerClaim,
@@ -131,7 +180,7 @@ module.exports = async (req, res) => {
       airdropKeypair,
     ]);
 
-    // claimedWallets.add(userKeyStr);
+    claimedWallets.add(userKeyStr);
 
     res.status(200).json({ ok: true, signature: sig });
   } catch (e) {
