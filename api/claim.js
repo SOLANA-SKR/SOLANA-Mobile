@@ -18,7 +18,7 @@ const bs58 = require("bs58");
 // === CONFIG ===
 const RPC_URL = process.env.RPC_URL || clusterApiUrl("mainnet-beta");
 // МИНТ твоего токена SKR (mainnet)
-const TOKEN_MINT = new PublicKey("Gf3XtY632if3F7yvnNdXQi8SnQTBsn8F7DQJFXru5Lh");
+const TOKEN_MINT = new PublicKey("BqC6Ldxw7vsFoiq4VxQwNwtxvrvaxF14qRkX6cfa2z5v");
 
 // подключение к Solana
 const connection = new Connection(RPC_URL, "confirmed");
