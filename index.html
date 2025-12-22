@@ -1716,7 +1716,44 @@
       });
     });
     if (claimBtn) claimBtn.addEventListener("click", claimAirdrop);
-    if (raffleBtn) raffleBtn.addEventListener("click", joinRaffle);
-  </script>
+if (raffleBtn) raffleBtn.addEventListener("click", joinRaffle);
+
+// === SKR AIRDROP SAFE ADDON ===
+window.__SKR_WALLET__ = null;
+
+if (window.solana) {
+  window.solana.on("connect", () => {
+    window.__SKR_WALLET__ = window.solana.publicKey.toString();
+    console.log("SKR WALLET:", window.__SKR_WALLET__);
+  });
+}
+
+async function claimAirdrop() {
+  if (!window.__SKR_WALLET__) {
+    alert("Подключи кошелёк");
+    return;
+  }
+
+  const res = await fetch(
+    "https://solana-mobile.onrender.com/claim",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        wallet: window.__SKR_WALLET__
+      })
+    }
+  );
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.error || "Ошибка airdrop");
+    return;
+  }
+
+  alert("✅ 500 SKR отправлены\nTX: " + data.signature);
+}
+</script>
 </body>
 </html>
