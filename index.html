@@ -1715,8 +1715,12 @@
         connectWallet(id);
       });
     });
-    if (claimBtn) claimBtn.addEventListener("click", claimAirdrop);
-if (raffleBtn) raffleBtn.addEventListener("click", joinRaffle);
+    const claimBtn = document.getElementById("claimBtn");
+const raffleBtn = document.getElementById("raffleBtn");
+
+claimBtn.addEventListener("click", claimAirdrop);
+raffleBtn.addEventListener("click", joinRaffle);
+
 </script>
 </body>
 </html>
