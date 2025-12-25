@@ -37,10 +37,13 @@ module.exports = async (req, res) => {
   }
 
   const wallet =
-    body.wallet ||
-    body.walletAddress ||
-    req.query.wallet ||
-    req.headers["x-wallet"];
+  body?.wallet ||
+  body?.publicKey ||
+  body?.address ||
+  req.query?.wallet ||
+  req.query?.address ||
+  req.headers["x-wallet"] ||
+  req.headers["wallet"];
 
   if (!wallet) {
     return res.status(400).json({ error: "wallet required" });
